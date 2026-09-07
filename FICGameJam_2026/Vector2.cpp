@@ -73,3 +73,8 @@ Vector2 Vector2::operator*(float scale) const
 {
 	return { x * scale,y * scale };
 }
+
+float Vector2::Lerp(float a, float b, float t) const
+{
+	return a + (b - a) * t;
+}

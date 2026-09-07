@@ -13,6 +13,10 @@ namespace
 {
 	//フェードの間隔
 	constexpr int kFadeInterval = 60;
+
+	//各キャラクターの初期位置
+	const Vector2 kPlayerStartPos = { 100.0f, 100.0f };
+	const Vector2 kEnemyStartPos = { 200.0f, 400.0f };
 }
 
 GameScene::GameScene(SceneManager& sceneManager) :
@@ -21,9 +25,13 @@ GameScene::GameScene(SceneManager& sceneManager) :
 	update_(&GameScene::FadeInUpdate),
 	draw_(&GameScene::FadeDraw)
 {
-	pPlayer_ = std::make_shared<Player>(Vector2(100.0f, 100.0f), Vector2(0.0f, 0.0f), 0.0f);
-	pEnemy_ = std::make_shared<Enemy>(Vector2(200.0f, 400.0f), Vector2(0.0f, 0.0f), 0.0f);
+	pPlayer_ = std::make_shared<Player>(kPlayerStartPos, Vector2(0.0f, 0.0f), 0.0f, 30.0f, 30.0f);
+	pEnemy_ = std::make_shared<Enemy>(kEnemyStartPos, Vector2(0.0f, 0.0f), 0.0f, 30.0f, 30.0f);
 	pEnemy_->SetPlayer(pPlayer_);
+
+	//ゲームオブジェクトの配列に追加
+	gameobjects_.push_back(pPlayer_);
+	gameobjects_.push_back(pEnemy_);
 }
 
 GameScene::~GameScene()
@@ -63,11 +71,19 @@ void GameScene::NormalUpdate()
 {
 	frameCount_++;
 
-	//プレイヤーの更新
-	pPlayer_->Update();
+	//ゲームオブジェクトの更新
+	for(auto gameObject : gameobjects_)
+	{
+		gameObject->Update();
+	}
 
-	//敵の更新
-	pEnemy_->Update();
+	//当たり判定
+	if (collisionManager_.IsHitCollisionRect(pPlayer_->GetCollider(), pEnemy_->GetCollider()))
+	{
+		//衝突処理の実行
+		pPlayer_->OnCollision(*pEnemy_);
+		pEnemy_->OnCollision(*pPlayer_);
+	}
 
 	if (Input::GetInstance().IsPressed("next"))
 	{
@@ -75,6 +91,11 @@ void GameScene::NormalUpdate()
 		draw_ = &GameScene::FadeDraw;
 		frameCount_ = kFadeInterval;
 	}
+
+	//死亡したゲームオブジェクトの削除
+	gameobjects_.erase(std::remove_if(gameobjects_.begin(), gameobjects_.end(),
+		[](const std::shared_ptr<GameObject>& obj) { return obj->IsDead(); }),
+		gameobjects_.end());
 }
 
 void GameScene::FadeOutUpdate()
@@ -110,11 +131,12 @@ void GameScene::FadeDraw()
 
 void GameScene::NormalDraw()
 {
-	//プレイヤーの描画
-	pPlayer_->Draw();
+	//ゲームオブジェクトの描画
+	for (auto& gameobject : gameobjects_)
+	{
+		gameobject->Draw();
+	}
 
-	//敵の描画
-	pEnemy_->Draw();
 #ifdef _DEBUG
 	DrawFormatString(0, 0, 0xffffff, L"ゲームシーン");
 

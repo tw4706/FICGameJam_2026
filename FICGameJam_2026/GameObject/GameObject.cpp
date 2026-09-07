@@ -10,8 +10,3 @@ GameObject::GameObject(Vector2 pos, Vector2 vel,float dir) :
 }
 
 GameObject::~GameObject(){}
-
-void GameObject::AddPosition()
-{
-	pos_ += vel_;
-}

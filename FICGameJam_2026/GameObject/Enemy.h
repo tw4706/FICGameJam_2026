@@ -5,7 +5,7 @@ class Player;
 class Enemy :public Character
 {
 public:
-	Enemy(Vector2 pos, Vector2 vel, float dir);
+	Enemy(Vector2 pos, Vector2 vel, float dir, float width, float height);
 	virtual ~Enemy();
 	virtual void Init()override;
 	virtual void Update()override;

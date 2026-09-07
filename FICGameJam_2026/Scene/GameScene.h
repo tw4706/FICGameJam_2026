@@ -1,5 +1,8 @@
 #pragma once
 #include"Scene.h"
+#include"../GameObject/GameObject.h"
+#include "../Collider/CollisionManager.h"
+#include<vector>
 
 class Player;
 class Enemy;
@@ -27,7 +30,9 @@ public:
 private:
 	int frameCount_ = 0;
 
-	std::shared_ptr<Player>pPlayer_;	//プレイヤー
-	std::shared_ptr<Enemy>pEnemy_;		//敵
+	CollisionManager collisionManager_;						//当たり判定マネージャー
+	std::shared_ptr<Player>pPlayer_;						//プレイヤー
+	std::shared_ptr<Enemy>pEnemy_;							//敵
+	std::vector<std::shared_ptr<GameObject>>gameobjects_;	//ゲームオブジェクトの配列
 };
 

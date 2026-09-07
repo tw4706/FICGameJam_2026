@@ -22,7 +22,7 @@ public:
 	/// <summary>
 	/// 削除処理
 	/// </summary>
-	void Destory() { isDead_ = true; }
+	void Destroy() { isDead_ = true; }
 
 	///ゲッター
 	/// <summary>
@@ -49,12 +49,6 @@ public:
 	/// </summary>
 	/// <param name="vel">速度</param>
 	void SetVelocity(const Vector2& vel) { vel_ = vel; }
-
-	/// <summary>
-	/// 位置の更新
-	/// </summary>
-	/// <param name="pos">座標</param>
-	void AddPosition();
 
 protected:
 	Vector2 pos_;	//座標

@@ -14,8 +14,8 @@ namespace
 	//マウスカーソルの半径
 	constexpr float kCircleRadius = 100.0f;
 }
-Enemy::Enemy(Vector2 pos, Vector2 vel, float dir):
-	Character(pos,vel,dir),
+Enemy::Enemy(Vector2 pos, Vector2 vel, float dir,float width,float height):
+	Character(pos,vel,dir, kEnemySizeOffset, kEnemySizeOffset),
 	handle_(-1)
 {
 	//プレイヤーの初期化
@@ -74,6 +74,9 @@ void Enemy::Update()
 		vel_ = Vector2(0.0f, 0.0f);
 	}
 	pos_ += vel_;
+
+	//コライダー座標の更新
+	collider_.SetPos(pos_);
 }
 
 void Enemy::Draw()
