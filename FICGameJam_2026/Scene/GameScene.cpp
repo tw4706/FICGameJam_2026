@@ -31,7 +31,9 @@ namespace
 
 	//1タイルのサイズ
 	constexpr int kTileSize = 64;
-	constexpr int kTileColSize = 56;
+
+	//ステージの拡大率
+	constexpr float kStageScale = 1.05f;
 
 	//タイル画像の横の枚数
 	constexpr int kTilesetColumns = 6;
@@ -76,7 +78,8 @@ void GameScene::Init()
 	loader_->LoadTileset(kTilesetPath, kTileSize, kTilesetColumns, kTotalTiles);
 
 	//壁の矩形コライダーを生成
-	wallColliders_ = loader_->CreateColliders(kTileSize, kWallTileIds);
+	int scaledTileSize = static_cast<int>(kTileSize * kStageScale);
+	wallColliders_ = loader_->CreateColliders(scaledTileSize, kWallTileIds);
 }
 
 void GameScene::Update()
@@ -190,7 +193,7 @@ void GameScene::NormalDraw()
 	//ステージの描画
 	if (loader_)
 	{
-		loader_->Draw(0, 0);
+		loader_->Draw(0, 0, kStageScale);
 	}
 
 	//ゲームオブジェクトの描画

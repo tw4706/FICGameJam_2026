@@ -85,32 +85,29 @@ bool StageLoader::LoadTileset(const std::string& filePath, int tileSize, int col
         tilehandle_.data()) == 0;
 }
 
-void StageLoader::Draw(int offsetX, int offsetY) const
+void StageLoader::Draw(int offsetX, int offsetY, float scale) const
 {
+    //拡大後のタイルサイズ
+    float scaledTileSize = tileSize_ * scale;
+
     for (int y = 0; y < height_; ++y)
     {
         for (int x = 0; x < width_; ++x)
         {
             int id = stage_[y][x];
 
-            // 範囲外チェックおよび無効ハンドルのスキップ
-            if (id < 0 || id >= static_cast<int>(tilehandle_.size()))
-            {
-                continue;
-            }
+            if (id < 0 || id >= static_cast<int>(tilehandle_.size())) continue;
             int handle = tilehandle_[id];
-            if (handle == -1)
-            {
-                continue;
-            }
+            if (handle == -1) continue;
 
-            // タイルを描画
-            DrawGraph(
-                offsetX + x * tileSize_,
-                offsetY + y * tileSize_,
-                handle,
-                TRUE
-            );
+            // 描画位置をスケールに合わせて計算
+            int drawX1 = static_cast<int>(offsetX + x * scaledTileSize);
+            int drawY1 = static_cast<int>(offsetY + y * scaledTileSize);
+            int drawX2 = static_cast<int>(drawX1 + scaledTileSize);
+            int drawY2 = static_cast<int>(drawY1 + scaledTileSize);
+
+            //拡大して描画
+            DrawExtendGraph(drawX1, drawY1, drawX2, drawY2, handle, TRUE);
         }
     }
 }

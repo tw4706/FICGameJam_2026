@@ -1,2 +1,17 @@
-﻿  GameScene.cpp
+﻿  Application.cpp
+C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\Application.cpp(37,10): warning C4305: 'return': 'int' から 'bool' へ切り詰めます。
+  Enemy.cpp
+C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\GameObject\Enemy.cpp(85,65): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\GameObject\Enemy.cpp(85,49): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\GameObject\Enemy.cpp(85,33): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\GameObject\Enemy.cpp(85,17): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+  Player.cpp
+C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\GameObject\Player.cpp(86,65): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\GameObject\Player.cpp(86,49): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\GameObject\Player.cpp(86,33): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\GameObject\Player.cpp(86,17): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+  GameScene.cpp
+  ResultScene.cpp
+  TitleScene.cpp
+  コードを生成中...
   FICGameJam_2026.vcxproj -> C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\x64\Debug\FICGameJam_2026.exe
