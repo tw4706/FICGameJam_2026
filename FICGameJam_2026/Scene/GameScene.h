@@ -2,6 +2,7 @@
 #include"Scene.h"
 
 class Player;
+class Enemy;
 class GameScene:public Scene
 {
 public:
@@ -27,5 +28,6 @@ private:
 	int frameCount_ = 0;
 
 	std::shared_ptr<Player>pPlayer_;	//ƒvƒŒƒCƒ„[
+	std::shared_ptr<Enemy>pEnemy_;		//“G
 };
 

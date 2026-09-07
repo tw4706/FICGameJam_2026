@@ -1,6 +1,7 @@
 #include "ResultScene.h"
 #include "GameScene.h"
 #include "../GameObject/Player.h"
+#include "../GameObject/Enemy.h"
 #include "../Game.h"
 #include "../Input.h"
 #include "SceneManager.h"
@@ -20,7 +21,9 @@ GameScene::GameScene(SceneManager& sceneManager) :
 	update_(&GameScene::FadeInUpdate),
 	draw_(&GameScene::FadeDraw)
 {
-	pPlayer_ = std::make_shared<Player>(Vector2(0.0f, 0.0f), Vector2(0.0f, 0.0f), 0.0f);
+	pPlayer_ = std::make_shared<Player>(Vector2(100.0f, 100.0f), Vector2(0.0f, 0.0f), 0.0f);
+	pEnemy_ = std::make_shared<Enemy>(Vector2(200.0f, 400.0f), Vector2(0.0f, 0.0f), 0.0f);
+	pEnemy_->SetPlayer(pPlayer_);
 }
 
 GameScene::~GameScene()
@@ -63,6 +66,9 @@ void GameScene::NormalUpdate()
 	//プレイヤーの更新
 	pPlayer_->Update();
 
+	//敵の更新
+	pEnemy_->Update();
+
 	if (Input::GetInstance().IsPressed("next"))
 	{
 		update_ = &GameScene::FadeOutUpdate;
@@ -77,7 +83,7 @@ void GameScene::FadeOutUpdate()
 
 	if (frameCount_ < 0)
 	{
-		sceneManager_.ChangeScene(std::make_shared<GameScene>(sceneManager_));
+		sceneManager_.ChangeScene(std::make_shared<ResultScene>(sceneManager_));
 		return;
 	}
 }
@@ -107,6 +113,8 @@ void GameScene::NormalDraw()
 	//プレイヤーの描画
 	pPlayer_->Draw();
 
+	//敵の描画
+	pEnemy_->Draw();
 #ifdef _DEBUG
 	DrawFormatString(0, 0, 0xffffff, L"ゲームシーン");
 

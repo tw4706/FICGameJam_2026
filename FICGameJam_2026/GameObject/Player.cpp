@@ -18,7 +18,8 @@ namespace
 }
 
 Player::Player(Vector2 pos, Vector2 vel, float dir):
-	Character(pos,vel,dir)
+	Character(pos,vel,dir),
+	handle_(-1)
 {
 }
 
@@ -36,7 +37,7 @@ void Player::Update()
 	int mx, my;
 	GetMousePoint(&mx, &my);
 	//マウス座標をスクリーン座標に変換
-	Vector2 mousePos = { (float)mx - Game::kScreenWidth / 2, (float)my - Game::kScreenHeight / 2 };
+	Vector2 mousePos = { static_cast<float>(mx), static_cast<float>(my) };
 
 	//プレイヤーの座標をスクリーン座標に変換
 	Vector2 toMousePos = mousePos - pos_;
@@ -67,7 +68,6 @@ void Player::Draw()
 
 #ifdef _DEBUG
 	//デバッグ用プレイヤー表示
-	DrawBox(pos_.x+Game::kScreenWidth/2, pos_.y + Game::kScreenHeight/2,
-		pos_.x + Game::kScreenWidth / 2+ kPlayerSizeOffset, pos_.y+Game::kScreenHeight / 2+ kPlayerSizeOffset, 0xff0000, false);
+	DrawBox(pos_.x, pos_.y, pos_.x + +kPlayerSizeOffset, pos_.y + kPlayerSizeOffset, 0xff0000, false);
 #endif
 }
