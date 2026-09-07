@@ -6,6 +6,8 @@
 
 class Player;
 class Enemy;
+class StageLoader;
+class RectCollider;
 class GameScene:public Scene
 {
 public:
@@ -33,6 +35,8 @@ private:
 	CollisionManager collisionManager_;						//当たり判定マネージャー
 	std::shared_ptr<Player>pPlayer_;						//プレイヤー
 	std::shared_ptr<Enemy>pEnemy_;							//敵
+	std::unique_ptr<StageLoader> loader_;					//ステージローダー
+	std::vector<RectCollider> wallColliders_;
 	std::vector<std::shared_ptr<GameObject>>gameobjects_;	//ゲームオブジェクトの配列
 };
 

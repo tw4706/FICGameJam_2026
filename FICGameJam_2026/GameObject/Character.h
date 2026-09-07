@@ -33,6 +33,12 @@ public:
 	/// <param name="other">当たったキャラクター</param>
 	virtual void OnCollision(Character& other);
 
+	/// <summary>
+	/// 押し戻し量を受け取り座標を修正
+	/// </summary>
+	/// <param name="pushVector">押し出しのベクトル量</param>
+	void AdjustPosition(const Vector2& pushVector) { pos_ += pushVector; collider_.SetPos(pos_);}
+
 protected:
 	int hp_;
 	float gravity_ = 0.0f;		//重力の強さ

@@ -1,4 +1,5 @@
 #pragma once
+#include"../Vector2.h"
 
 class CircleCollider;
 class RectCollider;
@@ -14,4 +15,7 @@ public:
 	/// <returns>“–‚½‚Á‚Ä‚¢‚½‚çtrue,“–‚½‚Á‚Ä‚¢‚È‚©‚Á‚½‚çfalse‚ğ•Ô‚·</returns>
 	bool IsHitCircleAndCircle(const CircleCollider& c1, const CircleCollider& c2) const;
 	bool IsHitCollisionRect(const RectCollider& rectA, const RectCollider& rectB)const;
+
+	//‹éŒ`“¯m‚Ì‚ß‚è‚İ‚ğŒvZ‚·‚é
+	Vector2 GetOverlapRect(const RectCollider& rectA, const RectCollider& rectB) const;
 };

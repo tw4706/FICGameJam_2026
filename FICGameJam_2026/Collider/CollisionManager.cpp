@@ -23,3 +23,28 @@ bool CollisionManager::IsHitCollisionRect(const RectCollider& rectA, const RectC
 		rectA.GetBottom() > rectB.GetTop();
 }
 
+Vector2 CollisionManager::GetOverlapRect(const RectCollider& rectA, const RectCollider& rectB) const
+{
+    //重なっている領域の幅と高さを計算
+    float overlapX = (rectA.GetWidth() + rectB.GetWidth()) / 2.0f - std::abs(rectA.GetPos().x - rectB.GetPos().x);
+    float overlapY = (rectA.GetHeight() + rectB.GetHeight()) / 2.0f - std::abs(rectA.GetPos().y - rectB.GetPos().y);
+
+    //重なっていない場合はゼロベクトルを返す
+    if (overlapX <= 0.0f || overlapY <= 0.0f)
+    {
+        return Vector2(0.0f, 0.0f);
+    }
+
+    //めり込み量が少ない方の軸で押し戻す
+    if (overlapX < overlapY)
+    {
+        float sign = (rectA.GetPos().x < rectB.GetPos().x) ? -1.0f : 1.0f;
+        return Vector2(overlapX * sign, 0.0f);
+    }
+    else
+    {
+        float sign = (rectA.GetPos().y < rectB.GetPos().y) ? -1.0f : 1.0f;
+        return Vector2(0.0f, overlapY * sign);
+    }
+}
+

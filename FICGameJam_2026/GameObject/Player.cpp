@@ -7,9 +7,6 @@
 
 namespace
 {
-	//プレイヤーのサイズのオフセット
-	constexpr int kPlayerSizeOffset = 30;
-
 	//円の半径
 	//マウスカーソルの半径
 	constexpr float kCircleRadius = 100.0f;
@@ -25,7 +22,7 @@ namespace
 }
 
 Player::Player(Vector2 pos, Vector2 vel, float dir, float width, float height) :
-	Character(pos, vel, dir, kPlayerSizeOffset, kPlayerSizeOffset),
+	Character(pos, vel, dir, width, height),
 	handle_(-1)
 {
 }
@@ -84,7 +81,9 @@ void Player::Draw()
 
 #ifdef _DEBUG
 	//デバッグ用プレイヤー表示
-	DrawBox(pos_.x, pos_.y, pos_.x + +kPlayerSizeOffset, pos_.y + kPlayerSizeOffset, 0xff0000, false);
+	float halfW = collider_.GetWidth() / 2.0f;
+	float halfH = collider_.GetHeight() / 2.0f;
+	DrawBox(pos_.x - halfW, pos_.y - halfH, pos_.x + halfW, pos_.y + halfH, 0xff0000, false);
 #endif
 }
 

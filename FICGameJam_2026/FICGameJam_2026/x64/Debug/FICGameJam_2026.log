@@ -1,6 +1,2 @@
-﻿  Enemy.cpp
-C:\GitHub\FICGameJam_2026\FICGameJam_2026\GameObject\Enemy.cpp(86,59): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
-C:\GitHub\FICGameJam_2026\FICGameJam_2026\GameObject\Enemy.cpp(86,31): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
-C:\GitHub\FICGameJam_2026\FICGameJam_2026\GameObject\Enemy.cpp(86,21): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
-C:\GitHub\FICGameJam_2026\FICGameJam_2026\GameObject\Enemy.cpp(86,14): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
-  FICGameJam_2026.vcxproj -> C:\GitHub\FICGameJam_2026\FICGameJam_2026\x64\Debug\FICGameJam_2026.exe
+﻿  GameScene.cpp
+  FICGameJam_2026.vcxproj -> C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\x64\Debug\FICGameJam_2026.exe

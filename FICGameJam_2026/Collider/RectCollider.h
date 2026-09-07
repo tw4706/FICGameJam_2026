@@ -10,6 +10,9 @@ public:
 	float GetTop()    const;
 	float GetBottom() const;
 
+	float GetWidth()  const { return width_; }
+	float GetHeight() const { return height_; }
+
 private:
 	float width_;	//‰¡•
 	float height_;	//‚‚³

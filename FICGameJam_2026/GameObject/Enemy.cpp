@@ -8,14 +8,11 @@ namespace
 	//移動速度
 	constexpr float kSpeed = 1.0f;
 
-	//敵のサイズのオフセット
-	constexpr int kEnemySizeOffset = 30;
-
 	//マウスカーソルの半径
 	constexpr float kCircleRadius = 100.0f;
 }
 Enemy::Enemy(Vector2 pos, Vector2 vel, float dir,float width,float height):
-	Character(pos,vel,dir, kEnemySizeOffset, kEnemySizeOffset),
+	Character(pos,vel,dir, width, height),
 	handle_(-1)
 {
 	//プレイヤーの初期化
@@ -83,6 +80,8 @@ void Enemy::Draw()
 {
 #ifdef _DEBUG
 	//デバッグ用プレイヤー表示
-	DrawBox(pos_.x,pos_.y,pos_.x + + kEnemySizeOffset, pos_.y+ kEnemySizeOffset, 0xffff00, false);
+	float halfW = collider_.GetWidth() / 2.0f;
+	float halfH = collider_.GetHeight() / 2.0f;
+	DrawBox(pos_.x - halfW, pos_.y - halfH, pos_.x + halfW, pos_.y + halfH, 0xffff00, false);
 #endif
 }
