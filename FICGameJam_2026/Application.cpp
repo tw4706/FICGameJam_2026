@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Game.h"
+#include "Input.h"
 #include "Scene/TitleScene.h"
 #include "Scene/GameScene.h"
 #include "Scene/SceneManager.h"
@@ -60,6 +61,7 @@ void Application::Run()
 		//前のフレーム描画を削除
 		ClearDrawScreen();
 
+		Input::GetInstance().Update();
 		//シーンの更新と描画
 		sceneManager.Update();
 		sceneManager.Draw();

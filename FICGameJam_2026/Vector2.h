@@ -2,6 +2,8 @@
 class Vector2
 {
 public:
+	float x, y;
+public:
 	Vector2(float x, float y);							//コンストラクタ
 	float Length()const;				//ベクトルの大きさ
 	void Normalize();					//ベクトルの正規化
@@ -13,7 +15,5 @@ public:
 	Vector2 operator+(const Vector2& val)const;//ベクトルの加算
 	Vector2 operator-(const Vector2& val)const;//ベクトルの減算
 	Vector2 operator*(float scale)const;//ベクトルの乗算
-private:
-	float x, y;
 };
 

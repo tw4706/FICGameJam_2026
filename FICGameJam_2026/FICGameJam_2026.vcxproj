@@ -138,13 +138,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Collider\CircleCollider.cpp" />
+    <ClCompile Include="Collider\Collider.cpp" />
+    <ClCompile Include="Collider\CollisionManager.cpp" />
     <ClCompile Include="GameObject\Character.cpp" />
-    <ClCompile Include="CharacterStateBase.cpp" />
     <ClCompile Include="GameObject\Enemy.cpp" />
     <ClCompile Include="GameObject\GameObject.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GameObject\Player.cpp" />
+    <ClCompile Include="Collider\RectCollider.cpp" />
     <ClCompile Include="Scene\ResultScene.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
@@ -154,13 +157,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Collider\CircleCollider.h" />
+    <ClInclude Include="Collider\Collider.h" />
+    <ClInclude Include="Collider\CollisionManager.h" />
     <ClInclude Include="GameObject\Character.h" />
-    <ClInclude Include="CharacterStateBase.h" />
     <ClInclude Include="GameObject\Enemy.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject\GameObject.h" />
     <ClInclude Include="GameObject\Player.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="Collider\RectCollider.h" />
     <ClInclude Include="Scene\ResultScene.h" />
     <ClInclude Include="Scene\Scene.h" />
     <ClInclude Include="Scene\GameScene.h" />
