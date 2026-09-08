@@ -2,21 +2,12 @@
 #include<Dxlib.h>
 
 Character::Character(Vector2 pos, Vector2 vel, float dir, float width, float height):
-	GameObject(pos, vel, dir),
+	GameObject(pos, vel, dir,width,height),
 	hp_(0),
-	gravity_(0.7f),
-	collider_(pos, width, height)
+	state_(AnimState::Idle)
 {
 }
 
 Character::~Character()
 {
-}
-
-void Character::OnCollision(Character& other)
-{
-#ifdef _DEBUG
-	//衝突したらデバッグ表示
-	printfDx(L"当たった\n");
-#endif
 }

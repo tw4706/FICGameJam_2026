@@ -9,15 +9,18 @@ public:
 	virtual void Update()override;
 	virtual void Draw()override;
 
+	void ChangeState(AnimState state)override;
+
 	/// <summary>
 	/// 衝突判定
 	/// </summary>
 	/// <param name="other">当たったキャラクター</param>
-	void OnCollision(Character& other)override;
+	void OnCollision(GameObject& other)override;
 
 private:
-	int invisibleTimer_ = 0;	//無敵時間
 	int handle_ = -1;			//ハンドル
+	int runHandle_ =- 1;			//Run状態のハンドル
+	int invisibleTimer_ = 0;	//無敵時間
 	bool isInvisible_ = false;	//無敵状態かどうか
 };
 

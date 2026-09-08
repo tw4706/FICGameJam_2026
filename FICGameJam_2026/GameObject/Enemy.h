@@ -14,6 +14,8 @@ public:
 	virtual void Update()override;
 	virtual void Draw()override;
 
+	void ChangeState(AnimState state)override;
+
 	/// <summary>
 	/// プレイヤーの設定
 	/// </summary>
@@ -28,8 +30,12 @@ public:
 
 private:
 	int handle_ = -1;	//ハンドル
-	std::weak_ptr<Player>pPlayer_;
+	int runHandle_ =-1;	//Run状態のハンドル
+	int deathHandle_ =-1;	//Death状態のハンドル
+	int inCircleTimer_ = 0;//サークルに入っている時間を図るタイマー
+	bool isDying_ = false;	//死亡中かどうか
 
+	std::weak_ptr<Player>pPlayer_;
 	std::vector<Vector2>path_;
 	size_t pathIndex_ = 0;
 };

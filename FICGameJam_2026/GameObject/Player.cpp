@@ -18,7 +18,10 @@ namespace
 	constexpr int kMaxHP = 3;
 
 	//無敵時間
-	constexpr int kInvisibleTime = 30;
+	constexpr int kInvisibleTime = 80;
+
+	//移動とみなす閾値
+	constexpr float kMoveThreshold = 0.05f;
 }
 
 Player::Player(Vector2 pos, Vector2 vel, float dir, float width, float height) :
@@ -34,6 +37,12 @@ Player::~Player()
 void Player::Init()
 {
 	hp_ = kMaxHP;
+
+	handle_ = LoadGraph(L"data/Idle Meat.png");
+	runHandle_ = LoadGraph(L"data/Run Meat.png");
+
+	state_ = AnimState::Idle;
+	ChangeState(state_);
 }
 
 void Player::Update()
@@ -42,7 +51,7 @@ void Player::Update()
 	invisibleTimer_--;
 
 	//無敵時間が0以下になったら無敵を解除
-	if(invisibleTimer_ <= 0)
+	if (invisibleTimer_ <= 0)
 	{
 		isInvisible_ = false;
 	}
@@ -60,12 +69,28 @@ void Player::Update()
 	//速度の初期化
 	Vector2 moveVel = { 0.0f, 0.0f };
 
+	//位置の保存
+	Vector2 prevPos = pos_;
+
 	//マウスカーソルの座標が円の半径内にある場合、移動速度をつける
 	if (dist <= kCircleRadius && dist > 0.0f)
 	{
 		pos_.x = pos_.Lerp(pos_.x, mousePos.x, kLerpRate);
 		pos_.y = pos_.Lerp(pos_.y, mousePos.y, kLerpRate);
 	}
+
+	Vector2 moveAmount = pos_ - prevPos;
+	float moveLength = sqrtf(moveAmount.x * moveAmount.x + moveAmount.y * moveAmount.y);
+
+	AnimState newState = (moveLength > kMoveThreshold) ? Run : Idle;
+
+	if (newState != state_)
+	{
+		state_ = newState;
+		ChangeState(state_);
+	}
+
+	animation_.Update();
 
 	//コライダー座標の更新
 	collider_.SetPos(pos_);
@@ -79,15 +104,36 @@ void Player::Draw()
 	//マウスカーソルの描画
 	DrawCircle(mx, my, (int)kCircleRadius, 0x00ff00, false);
 
+	if (!isInvisible_ || invisibleTimer_ % 5 == 0)
+	{
+		//アニメーションの描画
+		animation_.Draw(pos_, false);
+
 #ifdef _DEBUG
-	//デバッグ用プレイヤー表示
-	float halfW = collider_.GetWidth() / 2.0f;
-	float halfH = collider_.GetHeight() / 2.0f;
-	DrawBox(pos_.x - halfW, pos_.y - halfH, pos_.x + halfW, pos_.y + halfH, 0xff0000, false);
+		//デバッグ用プレイヤー表示
+		float halfW = collider_.GetWidth() / 2.0f;
+		float halfH = collider_.GetHeight() / 2.0f;
+		DrawBox(pos_.x - halfW, pos_.y - halfH, pos_.x + halfW, pos_.y + halfH, 0xff0000, false);
 #endif
+	}
 }
 
-void Player::OnCollision(Character& other)
+void Player::ChangeState(AnimState state)
+{
+	switch (state)
+	{
+	case Idle:
+		animation_.Init(handle_, 0, Vector2{ 192,192 }, 7, 10, 0.75f, true);
+		break;
+	case Run:
+		animation_.Init(runHandle_, 0, Vector2{ 192,192 }, 5, 10, 0.75f, true);
+		break;
+	default:
+		break;
+	}
+}
+
+void Player::OnCollision(GameObject& other)
 {
 	if (isInvisible_)return;
 

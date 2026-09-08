@@ -31,8 +31,18 @@ public:
 	DrawFunc_t draw_;
 
 private:
+
+	//グラデーション画像を生成
+	void CreateLightGraph();
+
+	//マスクを合成する
+	void DrawLightMask(); 
+
+private:
 	int frameCount_ = 0;
 	int rePathTimer_ = 0;									//経路探索を再計算するタイマー
+	int lightHandle_ = -1;									//マウス中心のグラデーション画像
+	int darkMaskHandle_ = -1;								//毎フレーム描き直す黒マスク用スクリーン
 
 	CollisionManager collisionManager_;						//当たり判定マネージャー
 	PathFinder pathFinder_;									//経路探索

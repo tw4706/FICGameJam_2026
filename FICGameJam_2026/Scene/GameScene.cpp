@@ -17,6 +17,9 @@ namespace
 	//フェードの間隔
 	constexpr int kFadeInterval = 60;
 
+	//明るい場所の半径
+	constexpr int kLightRadius = 150;
+
 	//キャラクターの当たり判定サイズ
 	constexpr float kPlayerColSize = 30.0f;
 	constexpr float kEnemyColSize = 30.0f;
@@ -26,7 +29,7 @@ namespace
 	const Vector2 kEnemyStartPos = { 200.0f, 400.0f };
 
 	//ステージロード用
-	const std::string kStageCsvPath = "data/stage1.csv";
+	const std::string kStageCsvPath = "data/CSV/stage1.csv";
 	const std::string kTilesetPath = "data/tileset.png";
 
 	//1タイルのサイズ
@@ -74,6 +77,8 @@ void GameScene::Init()
 {
 	pPlayer_->Init();
 
+	pEnemy_->Init();
+
 	//壁タイルの設定
 	loader_->SetWallTileId(kWallTileIds);
 	//マップデータのロード
@@ -83,6 +88,9 @@ void GameScene::Init()
 	//壁の矩形コライダーを生成
 	int scaledTileSize = static_cast<int>(kTileSize * kStageScale);
 	wallColliders_ = loader_->CreateColliders(scaledTileSize, kWallTileIds);
+
+	CreateLightGraph();
+	darkMaskHandle_ = MakeScreen(Game::kScreenWidth, Game::kScreenHeight, false);
 }
 
 void GameScene::Update()
@@ -114,7 +122,7 @@ void GameScene::NormalUpdate()
 
 	//一定間隔で敵の経路を再計算する
 	rePathTimer_--;
-	if (rePathTimer_ <= 0 && pEnemy_)
+	if (rePathTimer_ <= 0 && pEnemy_&&!pEnemy_->IsDead())
 	{
 		float scaledTileSize = kTileSize * kStageScale;
 
@@ -170,8 +178,8 @@ void GameScene::NormalUpdate()
 		}
 	}
 
-	//当たり判定
-	if (collisionManager_.IsHitCollisionRect(pPlayer_->GetCollider(), pEnemy_->GetCollider()))
+	//当たり判定(敵が死亡していないとき)
+	if (pEnemy_ && !pEnemy_->IsDead() && collisionManager_.IsHitCollisionRect(pPlayer_->GetCollider(), pEnemy_->GetCollider()))
 	{
 		//衝突処理の実行
 		pPlayer_->OnCollision(*pEnemy_);
@@ -236,9 +244,55 @@ void GameScene::NormalDraw()
 		gameobject->Draw();
 	}
 
+	DrawLightMask();
+
 #ifdef _DEBUG
 	DrawFormatString(0, 0, 0xffffff, L"ゲームシーン");
 
 	DrawFormatString(0, 16, GetColor(255, 255, 255), L"FRAME:%d", frameCount_);
 #endif
+}
+
+void GameScene::CreateLightGraph()
+{
+	int size = kLightRadius * 2;
+	lightHandle_ = MakeScreen(size, size, FALSE);
+	SetDrawScreen(lightHandle_);
+
+	for (int y = 0; y < size; y++)
+	{
+		for (int x = 0; x < size; x++)
+		{
+			//中心に近いほど白,外側に行くほど黒くする
+			float dx = static_cast<float>(x - kLightRadius);
+			float dy = static_cast<float>(y - kLightRadius);
+			float dist = sqrtf(dx * dx + dy * dy);
+			float rate = 1.0f - std::clamp(dist / kLightRadius, 0.0f, 1.0f);
+			int val = static_cast<int>(rate * 255);
+			DrawPixel(x, y, GetColor(val, val, val));
+		}
+	}
+
+	SetDrawScreen(DX_SCREEN_BACK);
+}
+
+void GameScene::DrawLightMask()
+{
+	int mx, my;
+	GetMousePoint(&mx, &my);
+
+	int size = kLightRadius * 2;
+
+	//黒背景の上にグラデーション画像を貼ったマスクを作る
+	SetDrawScreen(darkMaskHandle_);
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, GetColor(0, 0, 0), TRUE);
+	DrawGraph(mx - kLightRadius, my - kLightRadius, lightHandle_, FALSE);
+	SetDrawScreen(DX_SCREEN_BACK);
+
+	//全体を黒い描画にする
+	//黒い背景と白い背景をゲーム画面に重ねることで
+	//マウスカーソルの周りだけ見えるようになる
+	SetDrawBlendMode(DX_BLENDMODE_MULA, 255);
+	DrawGraph(0, 0, darkMaskHandle_, FALSE);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }

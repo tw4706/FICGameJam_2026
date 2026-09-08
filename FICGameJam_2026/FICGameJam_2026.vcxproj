@@ -137,6 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Collider\CircleCollider.cpp" />
     <ClCompile Include="Collider\Collider.cpp" />
@@ -144,6 +145,7 @@
     <ClCompile Include="GameObject\Character.cpp" />
     <ClCompile Include="GameObject\Enemy.cpp" />
     <ClCompile Include="GameObject\GameObject.cpp" />
+    <ClCompile Include="GameObject\Goal.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GameObject\Player.cpp" />
@@ -158,6 +160,7 @@
     <ClCompile Include="Vector2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Collider\CircleCollider.h" />
     <ClInclude Include="Collider\Collider.h" />
@@ -167,6 +170,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject\GameObject.h" />
     <ClInclude Include="GameObject\Player.h" />
+    <ClInclude Include="GameObject\Goal.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Collider\RectCollider.h" />
     <ClInclude Include="PathFinder.h" />
