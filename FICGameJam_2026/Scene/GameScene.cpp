@@ -1,11 +1,12 @@
 #include "ResultScene.h"
 #include "GameScene.h"
-#include "../GameObject/Player.h"
-#include "../GameObject/Enemy.h"
 #include "../Game.h"
 #include "../Input.h"
 #include "SceneManager.h"
 #include "../StageLoader.h"
+#include "../GameObject/Goal.h"
+#include "../GameObject/Enemy.h"
+#include "../GameObject/Player.h"
 #include "../Collider/RectCollider.h"
 #include<Dxlib.h>
 #include<memory>
@@ -23,10 +24,12 @@ namespace
 	//キャラクターの当たり判定サイズ
 	constexpr float kPlayerColSize = 30.0f;
 	constexpr float kEnemyColSize = 30.0f;
+	constexpr float kGoalColSize = 30.0f;
 
 	//各キャラクターの初期位置
 	const Vector2 kPlayerStartPos = { 100.0f, 100.0f };
 	const Vector2 kEnemyStartPos = { 200.0f, 400.0f };
+	const Vector2 kGoalStartPos = { 900.0f, 100.0f };
 
 	//ステージロード用
 	const std::string kStageCsvPath = "data/CSV/stage1.csv";
@@ -53,7 +56,7 @@ namespace
 
 GameScene::GameScene(SceneManager& sceneManager) :
 	Scene(sceneManager),
-	frameCount_(0),
+	frameCount_(kFadeInterval),
 	update_(&GameScene::FadeInUpdate),
 	draw_(&GameScene::FadeDraw)
 {
@@ -63,9 +66,12 @@ GameScene::GameScene(SceneManager& sceneManager) :
 	pEnemy_ = std::make_shared<Enemy>(kEnemyStartPos, Vector2(0.0f, 0.0f), 0.0f, kEnemyColSize, kEnemyColSize);
 	pEnemy_->SetPlayer(pPlayer_);
 
+	pGoal_ = std::make_shared<Goal>(kGoalStartPos, Vector2(0.0f, 0.0f), 0.0f, kGoalColSize, kGoalColSize);
+
 	//ゲームオブジェクトの配列に追加
 	gameobjects_.push_back(pPlayer_);
 	gameobjects_.push_back(pEnemy_);
+	gameobjects_.push_back(pGoal_);
 }
 
 GameScene::~GameScene()
@@ -78,6 +84,8 @@ void GameScene::Init()
 	pPlayer_->Init();
 
 	pEnemy_->Init();
+
+	pGoal_->Init();
 
 	//壁タイルの設定
 	loader_->SetWallTileId(kWallTileIds);
@@ -186,6 +194,15 @@ void GameScene::NormalUpdate()
 		pEnemy_->OnCollision(*pPlayer_);
 	}
 
+	//ゴールに触れたらリザルトシーンに遷移する
+	if (pGoal_ && collisionManager_.IsHitCollisionRect(pPlayer_->GetCollider(), pGoal_->GetCollider()))
+	{
+		update_ = &GameScene::FadeOutUpdate;
+		draw_ = &GameScene::FadeDraw;
+		frameCount_ = kFadeInterval;
+		return;
+	}
+
 	if (Input::GetInstance().IsPressed("next"))
 	{
 		update_ = &GameScene::FadeOutUpdate;
@@ -217,17 +234,19 @@ void GameScene::FadeDraw()
 	if (update_ == &GameScene::FadeInUpdate)
 	{
 		//フェードイン
-		rate = (float)frameCount_ / kFadeInterval;
+		rate = 1.0f - (float)frameCount_ / kFadeInterval;
 	}
 	else
 	{
 		//フェードアウト
-		rate = 1.0f - (float)frameCount_ / kFadeInterval;
+		rate = (float)frameCount_ / kFadeInterval;
 	}
 
 	rate = std::clamp(rate, 0.0f, 1.0f);
 
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255 * rate));
 	NormalDraw();
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void GameScene::NormalDraw()

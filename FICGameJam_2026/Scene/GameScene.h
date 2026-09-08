@@ -5,6 +5,7 @@
 #include "../PathFinder.h"
 #include<vector>
 
+class Goal;
 class Player;
 class Enemy;
 class StageLoader;
@@ -48,8 +49,9 @@ private:
 	PathFinder pathFinder_;									//経路探索
 	std::shared_ptr<Player>pPlayer_;						//プレイヤー
 	std::shared_ptr<Enemy>pEnemy_;							//敵
+	std::shared_ptr<Goal>pGoal_;							//ゴール
 	std::unique_ptr<StageLoader> loader_;					//ステージローダー
-	std::vector<RectCollider> wallColliders_;
+	std::vector<RectCollider> wallColliders_;				//壁の当たり判定の配列
 	std::vector<std::shared_ptr<GameObject>>gameobjects_;	//ゲームオブジェクトの配列
 };
 

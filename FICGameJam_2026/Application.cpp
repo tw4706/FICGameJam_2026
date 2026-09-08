@@ -27,7 +27,7 @@ bool Application::Init()
 	ChangeWindowMode(true);
 
 	//ウィンドウのタイトル変更
-	SetMainWindowText(L"SamuraiAdapt");
+	SetMainWindowText(L"リミテッドエスケープ");
 
 	//画面のサイズ変更
 	SetGraphMode(Game::kScreenWidth, Game::kScreenHeight, Game::kColorBitNum);
@@ -68,7 +68,7 @@ void Application::Run()
 
 		//FPSの表示
 #ifdef _DEBUG
-		DrawFormatString(0, 0, GetColor(255, 255, 0), L"FPS:%d", nowFps);
+		DrawFormatString(0, 30, GetColor(255, 255, 0), L"FPS:%d", nowFps);
 #endif
 
 		if (isGameEnd_||CheckHitKey(KEY_INPUT_ESCAPE))

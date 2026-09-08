@@ -12,5 +12,6 @@ public:
 	void Draw()override;
 
 private:
+	int handle_;	//ƒnƒ“ƒhƒ‹
 };
 

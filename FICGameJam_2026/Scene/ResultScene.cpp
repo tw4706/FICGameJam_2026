@@ -81,21 +81,24 @@ void ResultScene::FadeDraw()
 	if (update_ == &ResultScene::FadeInUpdate)
 	{
 		//フェードイン
-		rate = (float)frameCount_ / kFadeInterval;
+		rate = 1.0f - (float)frameCount_ / kFadeInterval;
 	}
 	else
 	{
 		//フェードアウト
-		rate = 1.0f-(float)frameCount_ / kFadeInterval;
+		rate = (float)frameCount_ / kFadeInterval;
 	}
 
 	rate = std::clamp(rate, 0.0f, 1.0f);
 
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255 * rate));
 	NormalDraw();
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void ResultScene::NormalDraw()
 {
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x00ced1, true);
 #ifdef _DEBUG
 	DrawFormatString(0, 0, 0xffffff, L"リザルトシーン");
 #endif
