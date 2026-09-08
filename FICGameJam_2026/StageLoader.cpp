@@ -146,3 +146,10 @@ std::vector<RectCollider> StageLoader::CreateColliders(int tileSize, const std::
 
     return colliders;
 }
+
+bool StageLoader::IsWall(int gridX, int gridY) const
+{
+    int id = GetTile(gridX, gridY);
+    if (id == -1) return true;          //”ÍˆÍŠO‚Í•Çˆµ‚¢‚É‚·‚é
+    return wallTileIds_.count(id) > 0;
+}

@@ -48,7 +48,7 @@ void Application::Run()
 	SceneManager sceneManager;
 
 	//シーンの切り替え
-	sceneManager.ChangeScene(std::make_shared<GameScene>(sceneManager));
+	sceneManager.ChangeScene(std::make_shared<TitleScene>(sceneManager));
 
 #ifdef _DEBUG
 	//デバッグ時のFPS表示用変数

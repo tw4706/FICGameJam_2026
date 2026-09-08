@@ -2,6 +2,7 @@
 #include"Scene.h"
 #include"../GameObject/GameObject.h"
 #include "../Collider/CollisionManager.h"
+#include "../PathFinder.h"
 #include<vector>
 
 class Player;
@@ -31,8 +32,10 @@ public:
 
 private:
 	int frameCount_ = 0;
+	int rePathTimer_ = 0;									//経路探索を再計算するタイマー
 
 	CollisionManager collisionManager_;						//当たり判定マネージャー
+	PathFinder pathFinder_;									//経路探索
 	std::shared_ptr<Player>pPlayer_;						//プレイヤー
 	std::shared_ptr<Enemy>pEnemy_;							//敵
 	std::unique_ptr<StageLoader> loader_;					//ステージローダー

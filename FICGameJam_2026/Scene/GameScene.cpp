@@ -43,6 +43,9 @@ namespace
 
 	//壁として判定するタイルIDの集合
 	const std::set<int> kWallTileIds = { 0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 17 };
+
+	//経路探索を再計算する間隔
+	constexpr float kRePathInterval = 15.0f;
 }
 
 GameScene::GameScene(SceneManager& sceneManager) :
@@ -71,12 +74,12 @@ void GameScene::Init()
 {
 	pPlayer_->Init();
 
+	//壁タイルの設定
+	loader_->SetWallTileId(kWallTileIds);
 	//マップデータのロード
 	loader_->Load(kStageCsvPath);
-
 	//タイル画像のロード
 	loader_->LoadTileset(kTilesetPath, kTileSize, kTilesetColumns, kTotalTiles);
-
 	//壁の矩形コライダーを生成
 	int scaledTileSize = static_cast<int>(kTileSize * kStageScale);
 	wallColliders_ = loader_->CreateColliders(scaledTileSize, kWallTileIds);
@@ -108,6 +111,37 @@ void GameScene::FadeInUpdate()
 void GameScene::NormalUpdate()
 {
 	frameCount_++;
+
+	//一定間隔で敵の経路を再計算する
+	rePathTimer_--;
+	if (rePathTimer_ <= 0 && pEnemy_)
+	{
+		float scaledTileSize = kTileSize * kStageScale;
+
+		//敵とプレイヤーのグリッド座標を計算
+		PathFinder::Vector2Int startGrid{
+			static_cast<int>(pEnemy_->GetPos().x / scaledTileSize),
+			static_cast<int>(pEnemy_->GetPos().y / scaledTileSize) };
+		PathFinder::Vector2Int goalGrid{
+			static_cast<int>(pPlayer_->GetPos().x / scaledTileSize),
+			static_cast<int>(pPlayer_->GetPos().y / scaledTileSize) };
+
+		//ここで経路探索を行う
+		auto gridPath = pathFinder_.FindPath(startGrid, goalGrid, *loader_);
+
+		//グリッド座標→ワールド座標に変換
+		std::vector<Vector2> worldPath;
+		worldPath.reserve(gridPath.size());
+		for (const auto& g : gridPath)
+		{
+			worldPath.emplace_back(
+				g.x * scaledTileSize + scaledTileSize / 2.0f,
+				g.y * scaledTileSize + scaledTileSize / 2.0f);
+		}
+		pEnemy_->SetPath(worldPath);
+
+		rePathTimer_ = kRePathInterval;
+	}
 
 	//ゲームオブジェクトの更新
 	for(auto& gameObject : gameobjects_)
