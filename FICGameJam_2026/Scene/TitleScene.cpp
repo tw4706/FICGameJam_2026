@@ -3,6 +3,7 @@
 #include "../Game.h"
 #include "../Application.h"
 #include "../Input.h"
+#include "../Button.h"
 #include<Dxlib.h>
 #include<memory>
 #include<cassert>
@@ -12,6 +13,10 @@ namespace
 {
 	//フェードの間隔
 	constexpr int kFadeInterval = 60;
+
+	//ボタンの当たり判定サイズ
+	constexpr int kButtonHitWidth = 240;
+	constexpr int kButtonHitHeight = 60;
 }
 
 TitleScene::TitleScene(SceneManager& sceneManager) :
@@ -37,14 +42,21 @@ void TitleScene::Init()
 	//ボタン画像のサイズを取得
 	GetGraphSize(button1FrameHandle_, &buttonWidth_, &buttonHeight_);
 
-	//ボタンの左上座標
-	button1X_ = Game::kScreenWidth / 2 - buttonWidth_ / 2;
-	button1Y_ = Game::kScreenHeight / 2;
+	//ボタンの中心座標を計算しButtonを生成
+	int centerX = Game::kScreenWidth / 2;
+	int button1CenterY = Game::kScreenHeight / 2 + buttonHeight_ / 2;
+	int button2CenterY = Game::kScreenHeight / 2 + 80 + buttonHeight_ / 2;
 
-	button2X_ = Game::kScreenWidth / 2 - buttonWidth_ / 2;
-	button2Y_ = Game::kScreenHeight / 2 + 80;
+	//ボタンの生成
+	startButton_ = std::make_unique<Button>(
+		centerX, button1CenterY,
+		kButtonHitWidth, kButtonHitHeight,
+		button1FrameHandle_);
 
-	mouseLeftWasPressed_ = false;
+	exitButton_ = std::make_unique<Button>(
+		centerX, button2CenterY,
+		kButtonHitWidth, kButtonHitHeight,
+		button2FrameHandle_);
 }
 
 void TitleScene::Update()
@@ -70,73 +82,22 @@ void TitleScene::FadeInUpdate()
 
 void TitleScene::NormalUpdate()
 {
-	//マウス座標を取得
-	GetMousePoint(&mouseX_, &mouseY_);
+	startButton_->Update();
+	exitButton_->Update();
 
-	//ボタンの中心座標
-	int button1CenterX =
-		button1X_ + buttonWidth_ / 2;
-
-	int button1CenterY =
-		button1Y_ + buttonHeight_ / 2;
-
-	int button2CenterX =
-		button2X_ + buttonWidth_ / 2;
-
-	int button2CenterY =
-		button2Y_ + buttonHeight_ / 2;
-
-	//ボタンの当たり判定
-	const int hitWidth = 240;
-	const int hitHeight = 60;
-
-	//上のボタンにカーソルがあるか
-	isButton1Hover_ =
-		mouseX_ >= button1CenterX - hitWidth / 2 &&
-		mouseX_ <= button1CenterX + hitWidth / 2 &&
-		mouseY_ >= button1CenterY - hitHeight / 2 &&
-		mouseY_ <= button1CenterY + hitHeight / 2;
-
-	//下のボタンにカーソルがあるか
-	isButton2Hover_ =
-		mouseX_ >= button2CenterX - hitWidth / 2 &&
-		mouseX_ <= button2CenterX + hitWidth / 2 &&
-		mouseY_ >= button2CenterY - hitHeight / 2 &&
-		mouseY_ <= button2CenterY + hitHeight / 2;
-
-
-	//マウスオーバーしたら拡大
-	button1Scale_ = isButton1Hover_ ? 1.2f : 1.0f;
-	button2Scale_ = isButton2Hover_ ? 1.2f : 1.0f;
-
-
-	//左クリック状態
-	int mouseInput = GetMouseInput();
-
-	bool mouseLeftPressed =
-		(mouseInput & MOUSE_INPUT_LEFT) != 0;
-
-
-	//「押した瞬間」だけ判定
-	bool mouseLeftTriggered =
-		mouseLeftPressed && !mouseLeftWasPressed_;
-
-	if (mouseLeftTriggered && isButton1Hover_)
+	//スタートボタンが押されたらゲームシーンへ遷移
+	if (startButton_->IsClicked())
 	{
 		update_ = &TitleScene::FadeOutUpdate;
 		draw_ = &TitleScene::FadeDraw;
 		frameCount_ = kFadeInterval;
 	}
 
-	//下ボタンを押されたらゲーム終了
-	if (mouseLeftTriggered && isButton2Hover_)
+	//終了ボタンが押されたらゲーム終了
+	if (exitButton_->IsClicked())
 	{
 		Application::GetInstance().GameEnd();
 	}
-
-
-	//前フレームのクリック状態を保存
-	mouseLeftWasPressed_ = mouseLeftPressed;
 }
 
 void TitleScene::FadeOutUpdate()
@@ -177,20 +138,8 @@ void TitleScene::NormalDraw()
 
 	DrawGraph(Game::kScreenWidth/2-530, Game::kScreenHeight/2-680, titleLogoHandle_, true);
 
-	//上ボタン
-	int button1CenterX = button1X_ + buttonWidth_ / 2;
-	int button1CenterY = button1Y_ + buttonHeight_ / 2;
-
-	DrawRotaGraph(button1CenterX,button1CenterY,
-		button1Scale_,0.0,button1FrameHandle_,true);
-
-	//下ボタン
-	int button2CenterX = button2X_ + buttonWidth_ / 2;
-	int button2CenterY = button2Y_ + buttonHeight_ / 2;
-
-	DrawRotaGraph(button2CenterX,button2CenterY,
-		button2Scale_,0.0,button2FrameHandle_,true);
-
+	startButton_->Draw();
+	exitButton_->Draw();
 #ifdef _DEBUG
 	DrawFormatString(0, 0, 0xffffff, L"タイトルシーン");
 #endif

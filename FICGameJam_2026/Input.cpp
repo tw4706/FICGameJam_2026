@@ -20,6 +20,8 @@ Input::Input() :inputData_{}, lastInputData_{}, inputTable_{}
 	inputTable_["next"] = { {PeripheralType::keyboard,KEY_INPUT_RETURN},
 						{PeripheralType::padXInput,XINPUT_BUTTON_A} };
 
+	inputTable_["click"] = { {PeripheralType::mouse, MOUSE_INPUT_LEFT} };
+
 	//変な値が入らないように枠を開けておく
 	for (const auto& input : inputTable_)
 	{
@@ -39,6 +41,10 @@ void Input::Update()
 	//パッドが接続できているかどうか
 	isXInputConnected_ = (GetJoypadXInputState(DX_INPUT_PAD1, &xInputState_) == 0);
 
+	//マウス座標とマウス入力状態の取得
+	GetMousePoint(&mouseX_, &mouseY_);
+	int mouseInput = GetMouseInput();
+
 	//すべての入力イベントをチェック
 	for (const auto& inputInfo : inputTable_)
 	{
@@ -55,6 +61,9 @@ void Input::Update()
 				{
 					input = (xInputState_.Buttons[state.id] != 0);
 				}
+				break;
+			case PeripheralType::mouse:
+				input = (mouseInput & state.id) != 0;
 				break;
 			}
 			if (input)

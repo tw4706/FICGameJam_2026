@@ -12,6 +12,7 @@ enum class PeripheralType
 {
 	keyboard,
 	padXInput,
+	mouse
 };
 
 struct InputState
@@ -49,6 +50,10 @@ public:
 
 	//ボタンが離されたかどうか
 	bool IsReleased(const char* name)const;
+
+	//マウス座標の取得
+	int GetMouseX()const { return mouseX_; }
+	int GetMouseY()const { return mouseY_; }
 private:
 	std::map<std::string, std::vector<InputState>>inputTable_;	//イベント名と実際の入力の対応表
 	std::map<std::string, bool>inputData_;						//実際に入力されたかどうかのデータ
@@ -58,5 +63,9 @@ private:
 	XINPUT_STATE xInputState_={};
 	//パッドが接続できているかどうか
 	bool isXInputConnected_ =false;
+
+	//マウス座標
+	int mouseX_ = 0;
+	int mouseY_ = 0;
 };
 

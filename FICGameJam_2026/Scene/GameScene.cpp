@@ -309,7 +309,7 @@ void GameScene::DrawLightMask()
 	SetDrawScreen(DX_SCREEN_BACK);
 
 	//全体を黒い描画にする
-	//黒い背景と白い背景をゲーム画面に重ねることで
+	//黒い背景と白い背景を乗算することで
 	//マウスカーソルの周りだけ見えるようになる
 	SetDrawBlendMode(DX_BLENDMODE_MULA, 255);
 	DrawGraph(0, 0, darkMaskHandle_, FALSE);

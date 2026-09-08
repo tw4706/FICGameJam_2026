@@ -139,6 +139,7 @@
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="Collider\CircleCollider.cpp" />
     <ClCompile Include="Collider\Collider.cpp" />
     <ClCompile Include="Collider\CollisionManager.cpp" />
@@ -162,6 +163,7 @@
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Collider\CircleCollider.h" />
     <ClInclude Include="Collider\Collider.h" />
     <ClInclude Include="Collider\CollisionManager.h" />
