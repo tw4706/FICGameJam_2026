@@ -4,6 +4,7 @@
 #include "Scene/TitleScene.h"
 #include "Scene/GameScene.h"
 #include "Scene/SceneManager.h"
+#include "../EffectManager.h"
 #include<Dxlib.h>
 #include<memory>
 
@@ -39,6 +40,9 @@ bool Application::Init()
 
 	SetDrawScreen(DX_SCREEN_BACK);
 
+	AddFontResourceEx(L"data/Font/Corporate-Logo-Rounded-Bold-ver3.otf", FR_PRIVATE, NULL);
+	Game::kFontUIHandle = CreateFontToHandle(L"コーポレート・ロゴ（ラウンド）ver3 Bold", 40, -1);
+
 	return true;
 }
 
@@ -65,6 +69,10 @@ void Application::Run()
 		//シーンの更新と描画
 		sceneManager.Update();
 		sceneManager.Draw();
+
+		//エフェクトの更新と描画
+		EffectManager::GetInstance().Update();
+		EffectManager::GetInstance().Draw();
 
 		//FPSの表示
 #ifdef _DEBUG
@@ -98,5 +106,6 @@ void Application::Run()
 void Application::Terminate()
 {
 	//メモリの開放
+	RemoveFontResourceEx(L"data/Font/Corporate-Logo-Rounded-Bold-ver3.otf", FR_PRIVATE, NULL);
 	DxLib_End();				//ＤＸライブラリ使用の終了処理
 }

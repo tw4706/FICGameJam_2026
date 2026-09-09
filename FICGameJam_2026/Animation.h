@@ -24,6 +24,9 @@ public:
 
 	bool GetIsEnd();
 
+	//ÅŒã‚ÌƒRƒ}‚É“’B‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©
+	bool IsLastFrame() const { return !isLoop_ && nowAnimNum_ >= maxAnimNum_ - 1; }
+
 	bool operator!=(const Animation& other) const;
 private:
 	bool isLoop_;		// ŒJ‚è•Ô‚µÄ¶‚·‚é‚©‚Ç‚¤‚©

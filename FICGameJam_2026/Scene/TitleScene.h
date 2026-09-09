@@ -42,5 +42,5 @@ private:
 
 	//スタートボタン、終了ボタン
 	std::unique_ptr<Button> startButton_;
-	std::unique_ptr<Button> exitButton_;
+	std::unique_ptr<Button> endButton_;
 };

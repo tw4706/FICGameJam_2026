@@ -29,6 +29,9 @@ TitleScene::TitleScene(SceneManager& sceneManager) :
 
 TitleScene::~TitleScene()
 {
+	DeleteGraph(titleLogoHandle_);
+	DeleteGraph(button1FrameHandle_);
+	DeleteGraph(button2FrameHandle_);
 }
 
 void TitleScene::Init()
@@ -52,11 +55,13 @@ void TitleScene::Init()
 		centerX, button1CenterY,
 		kButtonHitWidth, kButtonHitHeight,
 		button1FrameHandle_);
+	startButton_->SetText(L"はじめる", Game::kFontUIHandle,0x000000);
 
-	exitButton_ = std::make_unique<Button>(
+	endButton_ = std::make_unique<Button>(
 		centerX, button2CenterY,
 		kButtonHitWidth, kButtonHitHeight,
 		button2FrameHandle_);
+	endButton_->SetText(L"終了", Game::kFontUIHandle, 0x000000);
 }
 
 void TitleScene::Update()
@@ -83,10 +88,10 @@ void TitleScene::FadeInUpdate()
 void TitleScene::NormalUpdate()
 {
 	startButton_->Update();
-	exitButton_->Update();
+	endButton_->Update();
 
 	//スタートボタンが押されたらゲームシーンへ遷移
-	if (startButton_->IsClicked())
+	if (startButton_->IsClicked()||Input::GetInstance().IsPressed("next"))
 	{
 		update_ = &TitleScene::FadeOutUpdate;
 		draw_ = &TitleScene::FadeDraw;
@@ -94,7 +99,7 @@ void TitleScene::NormalUpdate()
 	}
 
 	//終了ボタンが押されたらゲーム終了
-	if (exitButton_->IsClicked())
+	if (endButton_->IsClicked())
 	{
 		Application::GetInstance().GameEnd();
 	}
@@ -128,7 +133,7 @@ void TitleScene::FadeDraw()
 	rate = std::clamp(rate, 0.0f, 1.0f);
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255 * rate));
-	NormalDraw();	
+	NormalDraw();
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
@@ -139,7 +144,7 @@ void TitleScene::NormalDraw()
 	DrawGraph(Game::kScreenWidth/2-530, Game::kScreenHeight/2-680, titleLogoHandle_, true);
 
 	startButton_->Draw();
-	exitButton_->Draw();
+	endButton_->Draw();
 #ifdef _DEBUG
 	DrawFormatString(0, 0, 0xffffff, L"タイトルシーン");
 #endif

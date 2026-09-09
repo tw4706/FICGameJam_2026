@@ -103,8 +103,8 @@ void StageLoader::Draw(int offsetX, int offsetY, float scale) const
             // •`‰æˆÊ’u‚ğƒXƒP[ƒ‹‚É‡‚í‚¹‚ÄŒvZ
             int drawX1 = static_cast<int>(offsetX + x * scaledTileSize);
             int drawY1 = static_cast<int>(offsetY + y * scaledTileSize);
-            int drawX2 = static_cast<int>(drawX1 + scaledTileSize);
-            int drawY2 = static_cast<int>(drawY1 + scaledTileSize);
+            int drawX2 = static_cast<int>(offsetX + (x + 1) * scaledTileSize);
+            int drawY2 = static_cast<int>(offsetY + (y + 1) * scaledTileSize);
 
             //Šg‘å‚µ‚Ä•`‰æ
             DrawExtendGraph(drawX1, drawY1, drawX2, drawY2, handle, TRUE);

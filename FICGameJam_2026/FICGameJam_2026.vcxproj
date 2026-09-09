@@ -140,6 +140,10 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Button.cpp" />
+    <ClCompile Include="EffectManager.cpp" />
+    <ClCompile Include="GameObject\DeathEffect.cpp" />
+    <ClCompile Include="GameObject\Effect.cpp" />
+    <ClCompile Include="GameObject\Chest.cpp" />
     <ClCompile Include="Collider\CircleCollider.cpp" />
     <ClCompile Include="Collider\Collider.cpp" />
     <ClCompile Include="Collider\CollisionManager.cpp" />
@@ -164,6 +168,10 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Button.h" />
+    <ClInclude Include="EffectManager.h" />
+    <ClInclude Include="GameObject\DeathEffect.h" />
+    <ClInclude Include="GameObject\Effect.h" />
+    <ClInclude Include="GameObject\Chest.h" />
     <ClInclude Include="Collider\CircleCollider.h" />
     <ClInclude Include="Collider\Collider.h" />
     <ClInclude Include="Collider\CollisionManager.h" />

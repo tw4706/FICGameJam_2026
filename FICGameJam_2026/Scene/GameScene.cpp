@@ -8,6 +8,7 @@
 #include "../GameObject/Enemy.h"
 #include "../GameObject/Player.h"
 #include "../Collider/RectCollider.h"
+#include "../EffectManager.h"
 #include<Dxlib.h>
 #include<memory>
 #include<algorithm>
@@ -35,6 +36,14 @@ namespace
 	const std::string kStageCsvPath = "data/CSV/stage1.csv";
 	const std::string kTilesetPath = "data/tileset.png";
 
+	//宝箱の設置位置
+	const Vector2 kChestKeyPos = { 770.0f, 360.0f };
+	const Vector2 kChestEnemyPos1 = { 630.0f, 630.0f };
+	const Vector2 kChestEnemyPos2 = { 500.0f, 230.0f };
+
+	//宝箱をプレイヤーが開けられる距離
+	constexpr float kChestOpenRange = 100.0f;
+
 	//1タイルのサイズ
 	constexpr int kTileSize = 64;
 
@@ -52,6 +61,9 @@ namespace
 
 	//経路探索を再計算する間隔
 	constexpr float kRePathInterval = 15.0f;
+
+	//敵の生成にかかる時間
+	constexpr int kSpawnEnemyTime = 60;
 }
 
 GameScene::GameScene(SceneManager& sceneManager) :
@@ -63,29 +75,44 @@ GameScene::GameScene(SceneManager& sceneManager) :
 	loader_ = std::make_unique<StageLoader>();
 
 	pPlayer_ = std::make_shared<Player>(kPlayerStartPos, Vector2(0.0f, 0.0f), 0.0f, kPlayerColSize, kPlayerColSize);
-	pEnemy_ = std::make_shared<Enemy>(kEnemyStartPos, Vector2(0.0f, 0.0f), 0.0f, kEnemyColSize, kEnemyColSize);
-	pEnemy_->SetPlayer(pPlayer_);
 
 	pGoal_ = std::make_shared<Goal>(kGoalStartPos, Vector2(0.0f, 0.0f), 0.0f, kGoalColSize, kGoalColSize);
 
+	pChests_.push_back(std::make_shared<Chest>(kChestKeyPos, Chest::ChestContents::Key));
+	pChests_.push_back(std::make_shared<Chest>(kChestEnemyPos1, Chest::ChestContents::Enemy));
+	pChests_.push_back(std::make_shared<Chest>(kChestEnemyPos2, Chest::ChestContents::Enemy));
+
 	//ゲームオブジェクトの配列に追加
 	gameobjects_.push_back(pPlayer_);
-	gameobjects_.push_back(pEnemy_);
 	gameobjects_.push_back(pGoal_);
+
+	for (auto& chest : pChests_)
+	{
+		gameobjects_.push_back(chest);
+	}
 }
 
 GameScene::~GameScene()
 {
-	
+	DeleteGraph(lightHandle_);
+	DeleteGraph(darkMaskHandle_);
 }
 
 void GameScene::Init()
 {
+	//各オブジェクトの初期化
 	pPlayer_->Init();
 
-	pEnemy_->Init();
-
 	pGoal_->Init();
+
+	for (auto& chest : pChests_)
+	{
+		chest->Init();
+	}
+
+	//死亡エフェクトのロード
+	EffectManager::GetInstance().Load(L"death", L"data/deathEffect.png",
+		Vector2{ 192.0f, 192.0f }, 7, 4);
 
 	//壁タイルの設定
 	loader_->SetWallTileId(kWallTileIds);
@@ -128,33 +155,44 @@ void GameScene::NormalUpdate()
 {
 	frameCount_++;
 
+	//宝箱の更新
+	UpdateChests();
+
 	//一定間隔で敵の経路を再計算する
 	rePathTimer_--;
-	if (rePathTimer_ <= 0 && pEnemy_&&!pEnemy_->IsDead())
+	if (rePathTimer_ <= 0)
 	{
 		float scaledTileSize = kTileSize * kStageScale;
 
-		//敵とプレイヤーのグリッド座標を計算
-		PathFinder::Vector2Int startGrid{
-			static_cast<int>(pEnemy_->GetPos().x / scaledTileSize),
-			static_cast<int>(pEnemy_->GetPos().y / scaledTileSize) };
-		PathFinder::Vector2Int goalGrid{
-			static_cast<int>(pPlayer_->GetPos().x / scaledTileSize),
-			static_cast<int>(pPlayer_->GetPos().y / scaledTileSize) };
-
-		//ここで経路探索を行う
-		auto gridPath = pathFinder_.FindPath(startGrid, goalGrid, *loader_);
-
-		//グリッド座標→ワールド座標に変換
-		std::vector<Vector2> worldPath;
-		worldPath.reserve(gridPath.size());
-		for (const auto& g : gridPath)
+		for (auto& enemy : pEnemies_)
 		{
-			worldPath.emplace_back(
-				g.x * scaledTileSize + scaledTileSize / 2.0f,
-				g.y * scaledTileSize + scaledTileSize / 2.0f);
+			if (!enemy || enemy->IsDead())
+			{
+				continue;
+			}
+
+			//敵とプレイヤーのグリッド座標を計算
+			PathFinder::Vector2Int startGrid{
+				static_cast<int>(enemy->GetPos().x / scaledTileSize),
+				static_cast<int>(enemy->GetPos().y / scaledTileSize) };
+			PathFinder::Vector2Int goalGrid{
+				static_cast<int>(pPlayer_->GetPos().x / scaledTileSize),
+				static_cast<int>(pPlayer_->GetPos().y / scaledTileSize) };
+
+			//ここで経路探索を行う
+			auto gridPath = pathFinder_.FindPath(startGrid, goalGrid, *loader_);
+
+			//グリッド座標→ワールド座標に変換
+			std::vector<Vector2> worldPath;
+			worldPath.reserve(gridPath.size());
+			for (const auto& g : gridPath)
+			{
+				worldPath.emplace_back(
+					g.x * scaledTileSize + scaledTileSize / 2.0f,
+					g.y * scaledTileSize + scaledTileSize / 2.0f);
+			}
+			enemy->SetPath(worldPath);
 		}
-		pEnemy_->SetPath(worldPath);
 
 		rePathTimer_ = kRePathInterval;
 	}
@@ -178,20 +216,27 @@ void GameScene::NormalUpdate()
 			}
 
 			//敵の壁判定
-			if (pEnemy_ && collisionManager_.IsHitCollisionRect(pEnemy_->GetCollider(), wall))
+			for (auto& enemy : pEnemies_)
 			{
-				Vector2 pushVector = collisionManager_.GetOverlapRect(pEnemy_->GetCollider(), wall);
-				pEnemy_->AdjustPosition(pushVector);
+				if (enemy && collisionManager_.IsHitCollisionRect(enemy->GetCollider(), wall))
+				{
+					Vector2 pushVector = collisionManager_.GetOverlapRect(enemy->GetCollider(), wall);
+					enemy->AdjustPosition(pushVector);
+				}
 			}
 		}
 	}
 
 	//当たり判定(敵が死亡していないとき)
-	if (pEnemy_ && !pEnemy_->IsDead() && collisionManager_.IsHitCollisionRect(pPlayer_->GetCollider(), pEnemy_->GetCollider()))
+	for (auto& enemy : pEnemies_)
 	{
-		//衝突処理の実行
-		pPlayer_->OnCollision(*pEnemy_);
-		pEnemy_->OnCollision(*pPlayer_);
+		if (enemy && !enemy->IsDead() && !enemy->IsSpawn() && 
+			collisionManager_.IsHitCollisionRect(pPlayer_->GetCollider(), enemy->GetCollider()))
+		{
+			//衝突処理の実行
+			pPlayer_->OnCollision(*enemy);
+			enemy->OnCollision(*pPlayer_);
+		}
 	}
 
 	//ゴールに触れたらリザルトシーンに遷移する
@@ -203,17 +248,31 @@ void GameScene::NormalUpdate()
 		return;
 	}
 
+	//プレイヤーが死んだときリザルトシーンに遷移
+	if (pPlayer_ && pPlayer_->IsDead())
+	{
+		update_ = &GameScene::FadeOutUpdate;
+		draw_ = &GameScene::FadeDraw;
+		frameCount_ = kFadeInterval;
+		return;
+	}
+#ifdef _DEBUG
 	if (Input::GetInstance().IsPressed("next"))
 	{
 		update_ = &GameScene::FadeOutUpdate;
 		draw_ = &GameScene::FadeDraw;
 		frameCount_ = kFadeInterval;
 	}
+#endif
 
 	//死亡したゲームオブジェクトの削除
 	gameobjects_.erase(std::remove_if(gameobjects_.begin(), gameobjects_.end(),
 		[](const std::shared_ptr<GameObject>& obj) { return obj->IsDead(); }),
 		gameobjects_.end());
+
+	pEnemies_.erase(std::remove_if(pEnemies_.begin(), pEnemies_.end(),
+		[](const std::shared_ptr<Enemy>& enemy) { return !enemy || enemy->IsDead(); }),
+		pEnemies_.end());
 }
 
 void GameScene::FadeOutUpdate()
@@ -297,8 +356,8 @@ void GameScene::CreateLightGraph()
 
 void GameScene::DrawLightMask()
 {
-	int mx, my;
-	GetMousePoint(&mx, &my);
+	int mx = Input::GetInstance().GetMouseX();
+	int my = Input::GetInstance().GetMouseY();
 
 	int size = kLightRadius * 2;
 
@@ -314,4 +373,49 @@ void GameScene::DrawLightMask()
 	SetDrawBlendMode(DX_BLENDMODE_MULA, 255);
 	DrawGraph(0, 0, darkMaskHandle_, FALSE);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
+
+void GameScene::UpdateChests()
+{
+	//プレイヤーが近づいた宝箱を開ける
+	for (auto& chest : pChests_)
+	{
+		if (chest->IsOpened())
+		{
+			continue;
+		}
+
+		Vector2 diff = chest->GetPos() - pPlayer_->GetPos();
+		float dist = sqrtf(diff.x * diff.x + diff.y * diff.y);
+
+		if (dist <= kChestOpenRange && Input::GetInstance().IsTriggered("open"))
+		{
+			chest->Open();
+		}
+	}
+
+	//開けた宝箱の処理を行う
+	for (auto& chest : pChests_)
+	{
+		if (!chest->IsOpenEvent())
+		{
+			continue;
+		}
+
+		if (chest->GetContent() == Chest::ChestContents::Key)
+		{
+		}
+		else if (chest->GetContent() == Chest::ChestContents::Enemy)
+		{
+			//敵を宝箱の位置に出現させる
+			auto newEnemy = std::make_shared<Enemy>(
+				chest->GetPos(), Vector2(0.0f, 0.0f), 0.0f, kEnemyColSize, kEnemyColSize);
+			newEnemy->Init();
+			newEnemy->SetPlayer(pPlayer_);
+			newEnemy->SetSpawnTime(kSpawnEnemyTime);
+
+			pEnemies_.push_back(newEnemy);
+			gameobjects_.push_back(newEnemy);
+		}
+	}
 }

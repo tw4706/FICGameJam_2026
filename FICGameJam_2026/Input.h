@@ -52,8 +52,8 @@ public:
 	bool IsReleased(const char* name)const;
 
 	//マウス座標の取得
-	int GetMouseX()const { return mouseX_; }
-	int GetMouseY()const { return mouseY_; }
+	int GetMouseX()const { return static_cast<int>(virtualMouseX_); }
+	int GetMouseY()const { return static_cast<int>(virtualMouseY_); }
 private:
 	std::map<std::string, std::vector<InputState>>inputTable_;	//イベント名と実際の入力の対応表
 	std::map<std::string, bool>inputData_;						//実際に入力されたかどうかのデータ
@@ -67,5 +67,13 @@ private:
 	//マウス座標
 	int mouseX_ = 0;
 	int mouseY_ = 0;
+
+	//前フレームのマウス座標
+	int prevMouseX_ = 0;
+	int prevMouseY_ = 0;
+
+	//仮想のマウス座標(パッド対応のため)
+	float virtualMouseX_ = 0.0f;
+	float virtualMouseY_ = 0.0f;
 };
 

@@ -1,6 +1,7 @@
 #include "Enemy.h"
 #include "Player.h"
 #include "../Game.h"
+#include "../EffectManager.h"
 #include<Dxlib.h>
 
 namespace
@@ -28,6 +29,9 @@ Enemy::Enemy(Vector2 pos, Vector2 vel, float dir,float width,float height):
 
 Enemy::~Enemy()
 {
+	DeleteGraph(handle_);
+	DeleteGraph(runHandle_);
+	DeleteGraph(deathHandle_);
 }
 
 void Enemy::Init()
@@ -42,12 +46,19 @@ void Enemy::Init()
 
 void Enemy::Update()
 {
+	if (spawnTimer_ > 0)
+	{
+		spawnTimer_--;
+	}
+
 	//死亡演出中は更新を行わない
 	if (isDying_)
 	{
 		animation_.Update();
 		if (animation_.GetIsEnd())
 		{
+			//死亡エフェクトの生成
+			EffectManager::GetInstance().Play(L"death", pos_);
 			Destroy();
 		}
 		return;
@@ -71,8 +82,16 @@ void Enemy::Update()
 	//マウスカーソルの円の中に入っている場合は停止
 	if (distToMouse <= kCircleRadius)
 	{
+		//円の中ではIdleあにめーしょんをする
+		if (state_ != AnimState::Idle)
+		{
+			state_ = AnimState::Idle;
+			ChangeState(state_);
+		}
+
 		vel_ = Vector2(0.0f, 0.0f);
 		inCircleTimer_++;
+
 		//マウスカーソルの円の中に一定時間入っていたら消滅
 		if (inCircleTimer_ >= kInCircleDeathTime)
 		{

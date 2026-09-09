@@ -3,6 +3,7 @@
 #include"../GameObject/GameObject.h"
 #include "../Collider/CollisionManager.h"
 #include "../PathFinder.h"
+#include "../GameObject/Chest.h"
 #include<vector>
 
 class Goal;
@@ -39,18 +40,23 @@ private:
 	//マスクを合成する
 	void DrawLightMask(); 
 
+	//宝箱の更新
+	void UpdateChests();
+
 private:
 	int frameCount_ = 0;
 	int rePathTimer_ = 0;									//経路探索を再計算するタイマー
 	int lightHandle_ = -1;									//マウス中心のグラデーション画像
 	int darkMaskHandle_ = -1;								//毎フレーム描き直す黒マスク用スクリーン
+	bool isKey_ = false;									//鍵を持っているかどうか
 
 	CollisionManager collisionManager_;						//当たり判定マネージャー
 	PathFinder pathFinder_;									//経路探索
 	std::shared_ptr<Player>pPlayer_;						//プレイヤー
-	std::shared_ptr<Enemy>pEnemy_;							//敵
 	std::shared_ptr<Goal>pGoal_;							//ゴール
 	std::unique_ptr<StageLoader> loader_;					//ステージローダー
+	std::vector<std::shared_ptr<Chest>> pChests_;			//宝箱
+	std::vector<std::shared_ptr<Enemy>> pEnemies_;			//敵
 	std::vector<RectCollider> wallColliders_;				//壁の当たり判定の配列
 	std::vector<std::shared_ptr<GameObject>>gameobjects_;	//ゲームオブジェクトの配列
 };

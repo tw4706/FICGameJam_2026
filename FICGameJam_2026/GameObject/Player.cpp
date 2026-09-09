@@ -2,6 +2,7 @@
 #include "../Game.h"
 #include "GameObject.h"
 #include "../Input.h"
+#include "../EffectManager.h"
 #include"../Collider/RectCollider.h"
 #include<Dxlib.h>
 
@@ -21,7 +22,7 @@ namespace
 	constexpr int kInvisibleTime = 80;
 
 	//移動とみなす閾値
-	constexpr float kMoveThreshold = 0.05f;
+	constexpr float kMoveThreshold = 0.01f;
 }
 
 Player::Player(Vector2 pos, Vector2 vel, float dir, float width, float height) :
@@ -32,6 +33,8 @@ Player::Player(Vector2 pos, Vector2 vel, float dir, float width, float height) :
 
 Player::~Player()
 {
+	DeleteGraph(handle_);
+	DeleteGraph(runHandle_);
 }
 
 void Player::Init()
@@ -57,8 +60,8 @@ void Player::Update()
 	}
 
 	//マウス座標の取得
-	int mx, my;
-	GetMousePoint(&mx, &my);
+	int mx = Input::GetInstance().GetMouseX();
+	int my = Input::GetInstance().GetMouseY();
 	//マウス座標をスクリーン座標に変換
 	Vector2 mousePos = { static_cast<float>(mx), static_cast<float>(my) };
 
@@ -99,8 +102,8 @@ void Player::Update()
 void Player::Draw()
 {
 	//マウス座標の取得
-	int mx, my;
-	GetMousePoint(&mx, &my);
+	int mx = Input::GetInstance().GetMouseX();
+	int my = Input::GetInstance().GetMouseY();
 	//マウスカーソルの描画
 	DrawCircle(mx, my, (int)kCircleRadius, 0x00ff00, false);
 
@@ -147,6 +150,8 @@ void Player::OnCollision(GameObject& other)
 	//hpが0以下になったら削除
 	if (hp_ <= 0)
 	{
+		//死亡エフェクトの生成
+		EffectManager::GetInstance().Play(L"death", pos_);
 		Destroy();
 	}
 }
