@@ -27,6 +27,8 @@ namespace
 	constexpr float kEnemyColSize = 30.0f;
 	constexpr float kGoalColSize = 30.0f;
 
+	constexpr float kKeyColSize = 30.0f;
+
 	//各キャラクターの初期位置
 	const Vector2 kPlayerStartPos = { 100.0f, 100.0f };
 	const Vector2 kEnemyStartPos = { 200.0f, 400.0f };
@@ -40,6 +42,9 @@ namespace
 	const Vector2 kChestKeyPos = { 770.0f, 360.0f };
 	const Vector2 kChestEnemyPos1 = { 630.0f, 630.0f };
 	const Vector2 kChestEnemyPos2 = { 500.0f, 230.0f };
+
+	//鍵の座標
+	const Vector2 kKeyPos = { 770.0f, 360.0f };
 
 	//宝箱をプレイヤーが開けられる距離
 	constexpr float kChestOpenRange = 100.0f;
@@ -73,9 +78,7 @@ GameScene::GameScene(SceneManager& sceneManager) :
 	draw_(&GameScene::FadeDraw)
 {
 	loader_ = std::make_unique<StageLoader>();
-
 	pPlayer_ = std::make_shared<Player>(kPlayerStartPos, Vector2(0.0f, 0.0f), 0.0f, kPlayerColSize, kPlayerColSize);
-
 	pGoal_ = std::make_shared<Goal>(kGoalStartPos, Vector2(0.0f, 0.0f), 0.0f, kGoalColSize, kGoalColSize);
 
 	pChests_.push_back(std::make_shared<Chest>(kChestKeyPos, Chest::ChestContents::Key));
@@ -83,13 +86,13 @@ GameScene::GameScene(SceneManager& sceneManager) :
 	pChests_.push_back(std::make_shared<Chest>(kChestEnemyPos2, Chest::ChestContents::Enemy));
 
 	//ゲームオブジェクトの配列に追加
-	gameobjects_.push_back(pPlayer_);
 	gameobjects_.push_back(pGoal_);
 
 	for (auto& chest : pChests_)
 	{
 		gameobjects_.push_back(chest);
 	}
+	gameobjects_.push_back(pPlayer_);
 }
 
 GameScene::~GameScene()
@@ -100,6 +103,8 @@ GameScene::~GameScene()
 
 void GameScene::Init()
 {
+	SetMouseDispFlag(false);
+
 	//各オブジェクトの初期化
 	pPlayer_->Init();
 
@@ -240,12 +245,23 @@ void GameScene::NormalUpdate()
 	}
 
 	//ゴールに触れたらリザルトシーンに遷移する
-	if (pGoal_ && collisionManager_.IsHitCollisionRect(pPlayer_->GetCollider(), pGoal_->GetCollider()))
+	if (isKey_)
 	{
-		update_ = &GameScene::FadeOutUpdate;
-		draw_ = &GameScene::FadeDraw;
-		frameCount_ = kFadeInterval;
-		return;
+		if (pGoal_ && collisionManager_.IsHitCollisionRect(pPlayer_->GetCollider(), pGoal_->GetCollider()))
+		{
+			update_ = &GameScene::FadeOutUpdate;
+			draw_ = &GameScene::FadeDraw;
+			frameCount_ = kFadeInterval;
+			return;
+		}
+	}
+
+	//鍵との当たり判定
+	if (pKey_ && collisionManager_.IsHitCollisionRect(pKey_->GetCollider(), pPlayer_->GetCollider()))
+	{
+		//当たっていたら削除
+		pKey_->Destroy();
+		isKey_ = true;
 	}
 
 	//プレイヤーが死んだときリザルトシーンに遷移
@@ -404,6 +420,13 @@ void GameScene::UpdateChests()
 
 		if (chest->GetContent() == Chest::ChestContents::Key)
 		{
+			//鍵を宝箱の位置に出現させる
+			Vector2 keyPos = chest->GetPos();
+			auto newKey = std::make_shared<Key>(kKeyPos, Vector2{ 0.0f,0.0f }, 0.0f, kKeyColSize, kKeyColSize);
+			newKey->Init();
+
+			pKey_ = newKey;
+			gameobjects_.push_back(newKey);
 		}
 		else if (chest->GetContent() == Chest::ChestContents::Enemy)
 		{

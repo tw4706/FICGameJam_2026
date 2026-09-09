@@ -4,6 +4,7 @@
 #include "../Collider/CollisionManager.h"
 #include "../PathFinder.h"
 #include "../GameObject/Chest.h"
+#include "../GameObject/Key.h"
 #include<vector>
 
 class Goal;
@@ -54,6 +55,7 @@ private:
 	PathFinder pathFinder_;									//経路探索
 	std::shared_ptr<Player>pPlayer_;						//プレイヤー
 	std::shared_ptr<Goal>pGoal_;							//ゴール
+	std::shared_ptr<Key> pKey_;								//鍵
 	std::unique_ptr<StageLoader> loader_;					//ステージローダー
 	std::vector<std::shared_ptr<Chest>> pChests_;			//宝箱
 	std::vector<std::shared_ptr<Enemy>> pEnemies_;			//敵

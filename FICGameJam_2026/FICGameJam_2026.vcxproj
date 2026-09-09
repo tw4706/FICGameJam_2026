@@ -152,6 +152,7 @@
     <ClCompile Include="GameObject\GameObject.cpp" />
     <ClCompile Include="GameObject\Goal.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="GameObject\Key.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GameObject\Player.cpp" />
     <ClCompile Include="Collider\RectCollider.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="GameObject\Goal.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Collider\RectCollider.h" />
+    <ClInclude Include="GameObject\Key.h" />
     <ClInclude Include="PathFinder.h" />
     <ClInclude Include="Scene\ResultScene.h" />
     <ClInclude Include="Scene\Scene.h" />

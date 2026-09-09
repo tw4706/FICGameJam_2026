@@ -101,11 +101,13 @@ void Player::Update()
 
 void Player::Draw()
 {
+#ifdef _DEBUG
 	//マウス座標の取得
 	int mx = Input::GetInstance().GetMouseX();
 	int my = Input::GetInstance().GetMouseY();
 	//マウスカーソルの描画
 	DrawCircle(mx, my, (int)kCircleRadius, 0x00ff00, false);
+#endif
 
 	if (!isInvisible_ || invisibleTimer_ % 5 == 0)
 	{

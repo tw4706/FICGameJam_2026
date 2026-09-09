@@ -29,6 +29,7 @@ ResultScene::~ResultScene()
 
 void ResultScene::Init()
 {
+	SetMouseDispFlag(true);
 }
 
 void ResultScene::Update()
