@@ -47,7 +47,7 @@ private:
 private:
 	int frameCount_ = 0;
 	int rePathTimer_ = 0;									//経路探索を再計算するタイマー
-	int lightHandle_ = -1;									//マウス中心のグラデーション画像
+	int lightHandle_ = -1;									//マウス中心の画像
 	int darkMaskHandle_ = -1;								//毎フレーム描き直す黒マスク用スクリーン
 	bool isKey_ = false;									//鍵を持っているかどうか
 
@@ -62,4 +62,3 @@ private:
 	std::vector<RectCollider> wallColliders_;				//壁の当たり判定の配列
 	std::vector<std::shared_ptr<GameObject>>gameobjects_;	//ゲームオブジェクトの配列
 };
-
