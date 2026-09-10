@@ -9,6 +9,8 @@
 #include "../GameObject/Player.h"
 #include "../Collider/RectCollider.h"
 #include "../EffectManager.h"
+#include "../SoundManager.h"
+#include"../SaveData.h"
 #include<Dxlib.h>
 #include<memory>
 #include<algorithm>
@@ -36,6 +38,7 @@ namespace
 
 	//ステージロード用
 	const std::string kStageCsvPath = "data/CSV/stage1.csv";
+	const std::string kTutorialCsvPath = "data/CSV/tutorial.csv";
 	const std::string kTilesetPath = "data/tileset.png";
 
 	//宝箱の設置位置
@@ -43,11 +46,16 @@ namespace
 	const Vector2 kChestEnemyPos1 = { 630.0f, 630.0f };
 	const Vector2 kChestEnemyPos2 = { 500.0f, 230.0f };
 
+	//チュートリアルのキャラの位置
+	const Vector2 kTutorialPlayerStartPos = { 150.0f, 150.0f };
+	const Vector2 kTutorialGoalStartPos = { 900.0f, 300.0f };
+	const Vector2 kTutorialChestKeyPos = { 600.0f, 400.0f };
+
 	//鍵の座標
 	const Vector2 kKeyPos = { 770.0f, 360.0f };
 
 	//宝箱をプレイヤーが開けられる距離
-	constexpr float kChestOpenRange = 100.0f;
+	constexpr float kChestOpenRange = 60.0f;
 
 	//1タイルのサイズ
 	constexpr int kTileSize = 64;
@@ -71,19 +79,31 @@ namespace
 	constexpr int kSpawnEnemyTime = 60;
 }
 
-GameScene::GameScene(SceneManager& sceneManager) :
+GameScene::GameScene(SceneManager& sceneManager, StageType type) :
 	Scene(sceneManager),
 	frameCount_(kFadeInterval),
 	update_(&GameScene::FadeInUpdate),
-	draw_(&GameScene::FadeDraw)
+	draw_(&GameScene::FadeDraw),
+	type_(type)
 {
 	loader_ = std::make_unique<StageLoader>();
-	pPlayer_ = std::make_shared<Player>(kPlayerStartPos, Vector2(0.0f, 0.0f), 0.0f, kPlayerColSize, kPlayerColSize);
-	pGoal_ = std::make_shared<Goal>(kGoalStartPos, Vector2(0.0f, 0.0f), 0.0f, kGoalColSize, kGoalColSize);
+	if (type_ == StageType::Tutorial)
+	{
+		//チュートリアルの配置
+		pPlayer_ = std::make_shared<Player>(kTutorialPlayerStartPos, Vector2(0.0f, 0.0f), 0.0f, kPlayerColSize, kPlayerColSize);
+		pGoal_ = std::make_shared<Goal>(kTutorialGoalStartPos, Vector2(0.0f, 0.0f), 0.0f, kGoalColSize, kGoalColSize);
 
-	pChests_.push_back(std::make_shared<Chest>(kChestKeyPos, Chest::ChestContents::Key));
-	pChests_.push_back(std::make_shared<Chest>(kChestEnemyPos1, Chest::ChestContents::Enemy));
-	pChests_.push_back(std::make_shared<Chest>(kChestEnemyPos2, Chest::ChestContents::Enemy));
+		pChests_.push_back(std::make_shared<Chest>(kTutorialChestKeyPos, Chest::ChestContents::Key));
+	}
+	else
+	{
+		pPlayer_ = std::make_shared<Player>(kPlayerStartPos, Vector2(0.0f, 0.0f), 0.0f, kPlayerColSize, kPlayerColSize);
+		pGoal_ = std::make_shared<Goal>(kGoalStartPos, Vector2(0.0f, 0.0f), 0.0f, kGoalColSize, kGoalColSize);
+
+		pChests_.push_back(std::make_shared<Chest>(kChestKeyPos, Chest::ChestContents::Key));
+		pChests_.push_back(std::make_shared<Chest>(kChestEnemyPos1, Chest::ChestContents::Enemy));
+		pChests_.push_back(std::make_shared<Chest>(kChestEnemyPos2, Chest::ChestContents::Enemy));
+	}
 
 	//ゲームオブジェクトの配列に追加
 	gameobjects_.push_back(pGoal_);
@@ -121,16 +141,22 @@ void GameScene::Init()
 
 	//壁タイルの設定
 	loader_->SetWallTileId(kWallTileIds);
+
 	//マップデータのロード
-	loader_->Load(kStageCsvPath);
+	const std::string& stageCsvPath =(type_ == StageType::Tutorial) ? kTutorialCsvPath : kStageCsvPath;
+	loader_->Load(stageCsvPath);
+
 	//タイル画像のロード
 	loader_->LoadTileset(kTilesetPath, kTileSize, kTilesetColumns, kTotalTiles);
+
 	//壁の矩形コライダーを生成
 	int scaledTileSize = static_cast<int>(kTileSize * kStageScale);
 	wallColliders_ = loader_->CreateColliders(scaledTileSize, kWallTileIds);
 
 	CreateLightGraph();
 	darkMaskHandle_ = MakeScreen(Game::kScreenWidth, Game::kScreenHeight, false);
+
+	SoundManager::GetInstance().PlayBgm(BGM::Game);
 }
 
 void GameScene::Update()
@@ -203,7 +229,7 @@ void GameScene::NormalUpdate()
 	}
 
 	//ゲームオブジェクトの更新
-	for(auto& gameObject : gameobjects_)
+	for (auto& gameObject : gameobjects_)
 	{
 		gameObject->Update();
 	}
@@ -235,7 +261,7 @@ void GameScene::NormalUpdate()
 	//当たり判定(敵が死亡していないとき)
 	for (auto& enemy : pEnemies_)
 	{
-		if (enemy && !enemy->IsDead() && !enemy->IsSpawn() && 
+		if (enemy && !enemy->IsDead() && !enemy->IsSpawn() &&
 			collisionManager_.IsHitCollisionRect(pPlayer_->GetCollider(), enemy->GetCollider()))
 		{
 			//衝突処理の実行
@@ -262,6 +288,9 @@ void GameScene::NormalUpdate()
 		//当たっていたら削除
 		pKey_->Destroy();
 		isKey_ = true;
+		pKey_ = nullptr;
+
+		SoundManager::GetInstance().PlaySe(SE::GetKey);
 	}
 
 	//プレイヤーが死んだときリザルトシーンに遷移
@@ -287,7 +316,17 @@ void GameScene::NormalUpdate()
 		gameobjects_.end());
 
 	pEnemies_.erase(std::remove_if(pEnemies_.begin(), pEnemies_.end(),
-		[](const std::shared_ptr<Enemy>& enemy) { return !enemy || enemy->IsDead(); }),
+		[](const std::shared_ptr<Enemy>& enemy)
+		{
+			bool isDead = !enemy || enemy->IsDead();
+
+			//敵が死んでいるときに音を再生
+			if (isDead && enemy)
+			{
+				SoundManager::GetInstance().PlaySe(SE::Death);
+			}
+			return isDead;
+		}),
 		pEnemies_.end());
 }
 
@@ -297,7 +336,14 @@ void GameScene::FadeOutUpdate()
 
 	if (frameCount_ < 0)
 	{
-		sceneManager_.ChangeScene(std::make_shared<ResultScene>(sceneManager_));
+		if (type_ == StageType::Tutorial)
+		{
+			sceneManager_.ChangeScene(std::make_shared<GameScene>(sceneManager_, GameScene::StageType::Stage1));
+		}
+		else
+		{
+			sceneManager_.ChangeScene(std::make_shared<ResultScene>(sceneManager_));
+		}
 		return;
 	}
 }
@@ -386,7 +432,7 @@ void GameScene::DrawLightMask()
 	//全体を黒い描画にする
 	//黒い背景と白い背景を乗算することで
 	//マウスカーソルの周りだけ見えるようになる
-	SetDrawBlendMode(DX_BLENDMODE_MULA, 255);
+	SetDrawBlendMode(DX_BLENDMODE_MULA, 233);
 	DrawGraph(0, 0, darkMaskHandle_, FALSE);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
@@ -404,7 +450,7 @@ void GameScene::UpdateChests()
 		Vector2 diff = chest->GetPos() - pPlayer_->GetPos();
 		float dist = sqrtf(diff.x * diff.x + diff.y * diff.y);
 
-		if (dist <= kChestOpenRange && Input::GetInstance().IsTriggered("open"))
+		if (dist <= kChestOpenRange && Input::GetInstance().IsPressed("open"))
 		{
 			chest->Open();
 		}
@@ -422,11 +468,13 @@ void GameScene::UpdateChests()
 		{
 			//鍵を宝箱の位置に出現させる
 			Vector2 keyPos = chest->GetPos();
-			auto newKey = std::make_shared<Key>(kKeyPos, Vector2{ 0.0f,0.0f }, 0.0f, kKeyColSize, kKeyColSize);
+			auto newKey = std::make_shared<Key>(keyPos, Vector2{ 0.0f,0.0f }, 0.0f, kKeyColSize, kKeyColSize);
 			newKey->Init();
 
 			pKey_ = newKey;
 			gameobjects_.push_back(newKey);
+
+			SoundManager::GetInstance().PlaySe(SE::Spawn);
 		}
 		else if (chest->GetContent() == Chest::ChestContents::Enemy)
 		{
@@ -439,6 +487,7 @@ void GameScene::UpdateChests()
 
 			pEnemies_.push_back(newEnemy);
 			gameobjects_.push_back(newEnemy);
+			SoundManager::GetInstance().PlaySe(SE::Spawn);
 		}
 	}
 }

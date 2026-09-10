@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "../Game.h"
 #include "../EffectManager.h"
+#include "../SoundManager.h"
 #include<Dxlib.h>
 
 namespace
@@ -99,6 +100,7 @@ void Enemy::Update()
 			isDying_ = true;
 			state_ = Death;
 			ChangeState(state_);
+			SoundManager::GetInstance().PlaySe(SE::EnemyDeath);
 		}
 		return;
 	}

@@ -15,7 +15,14 @@ class RectCollider;
 class GameScene:public Scene
 {
 public:
-	GameScene(SceneManager& sceneManager);
+
+	enum class StageType
+	{
+		Tutorial,
+		Stage1
+	};
+
+	GameScene(SceneManager& sceneManager,StageType type);
 	~GameScene();
 
 	void Init()override;
@@ -53,6 +60,7 @@ private:
 
 	CollisionManager collisionManager_;						//当たり判定マネージャー
 	PathFinder pathFinder_;									//経路探索
+	StageType type_;										//ステージタイプ
 	std::shared_ptr<Player>pPlayer_;						//プレイヤー
 	std::shared_ptr<Goal>pGoal_;							//ゴール
 	std::shared_ptr<Key> pKey_;								//鍵

@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "../Input.h"
 #include "../EffectManager.h"
+#include "../SoundManager.h"
 #include"../Collider/RectCollider.h"
 #include<Dxlib.h>
 
@@ -144,6 +145,7 @@ void Player::OnCollision(GameObject& other)
 
 	//当たったら体力を減らす
 	hp_--;
+	SoundManager::GetInstance().PlaySe(SE::PlayerHit);
 
 	//無敵
 	isInvisible_ = true;
@@ -154,6 +156,7 @@ void Player::OnCollision(GameObject& other)
 	{
 		//死亡エフェクトの生成
 		EffectManager::GetInstance().Play(L"death", pos_);
+		SoundManager::GetInstance().PlaySe(SE::Death);
 		Destroy();
 	}
 }

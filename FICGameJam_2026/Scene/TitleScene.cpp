@@ -4,6 +4,8 @@
 #include "../Application.h"
 #include "../Input.h"
 #include "../Button.h"
+#include "../SoundManager.h"
+#include "../SaveData.h"
 #include<Dxlib.h>
 #include<memory>
 #include<cassert>
@@ -15,8 +17,8 @@ namespace
 	constexpr int kFadeInterval = 60;
 
 	//ボタンの当たり判定サイズ
-	constexpr int kButtonHitWidth = 240;
-	constexpr int kButtonHitHeight = 60;
+	constexpr int kButtonWidth = 240;
+	constexpr int kButtonHeight = 60;
 }
 
 TitleScene::TitleScene(SceneManager& sceneManager) :
@@ -53,15 +55,17 @@ void TitleScene::Init()
 	//ボタンの生成
 	startButton_ = std::make_unique<Button>(
 		centerX, button1CenterY,
-		kButtonHitWidth, kButtonHitHeight,
+		kButtonWidth, kButtonHeight,
 		button1FrameHandle_);
 	startButton_->SetText(L"はじめる", Game::kFontUIHandle,0x000000);
 
 	endButton_ = std::make_unique<Button>(
 		centerX, button2CenterY,
-		kButtonHitWidth, kButtonHitHeight,
+		kButtonWidth, kButtonHeight,
 		button2FrameHandle_);
 	endButton_->SetText(L"終了", Game::kFontUIHandle, 0x000000);
+
+	SoundManager::GetInstance().PlayBgm(BGM::Title);
 }
 
 void TitleScene::Update()
@@ -111,7 +115,14 @@ void TitleScene::FadeOutUpdate()
 
 	if (frameCount_ <= 0)
 	{
-		sceneManager_.ChangeScene(std::make_shared<GameScene>(sceneManager_));
+		if (SaveData::IsClearedTutorial())
+		{
+			sceneManager_.ChangeScene(std::make_shared<GameScene>(sceneManager_, GameScene::StageType::Stage1));
+		}
+		else
+		{
+			sceneManager_.ChangeScene(std::make_shared<GameScene>(sceneManager_, GameScene::StageType::Tutorial));
+		}
 		return;
 	}
 }

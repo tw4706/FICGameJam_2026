@@ -1,16 +1,17 @@
 #include "Button.h"
 #include "Input.h"
+#include "../SoundManager.h"
 #include <Dxlib.h>
 
 namespace
 {
-	constexpr float kHoverScale = 1.2f;
+	constexpr float kHoverScale = 1.3f;
 	constexpr float kNormalScale = 1.0f;
 }
 
 Button::Button(int centerX, int centerY, int hitWidth, int hitHeight, int handle) :
 	centerX_(centerX), centerY_(centerY),
-	hitWidth_(hitWidth), hitHeight_(hitHeight),
+	width_(hitWidth), height_(hitHeight),
 	handle_(handle)
 {
 }
@@ -21,13 +22,21 @@ void Button::Update()
 	int mouseX = input.GetMouseX();
 	int mouseY = input.GetMouseY();
 
+	wasHover_ = isHover_;
+
 	isHover_ =
-		mouseX >= centerX_ - hitWidth_ / 2 &&
-		mouseX <= centerX_ + hitWidth_ / 2 &&
-		mouseY >= centerY_ - hitHeight_ / 2 &&
-		mouseY <= centerY_ + hitHeight_ / 2;
+		mouseX >= centerX_ - width_ / 2 &&
+		mouseX <= centerX_ + width_ / 2 &&
+		mouseY >= centerY_ - height_ / 2 &&
+		mouseY <= centerY_ + height_ / 2;
 
 	scale_ = isHover_ ? kHoverScale : kNormalScale;
+
+	//ホバーを始めた時だけ音を鳴らす
+	if (isHover_ && !wasHover_)
+	{
+		SoundManager::GetInstance().PlaySe(SE::CursoleMove);
+	}
 }
 
 void Button::Draw() const
@@ -51,7 +60,14 @@ void Button::Draw() const
 
 bool Button::IsClicked() const
 {
-	return isHover_ && Input::GetInstance().IsTriggered("click");
+	bool clicked = isHover_ && Input::GetInstance().IsTriggered("click");
+
+	if (clicked)
+	{
+		SoundManager::GetInstance().PlaySe(SE::Decide);
+	}
+
+	return clicked;
 }
 
 void Button::SetText(const std::wstring& text, int fontHandle, unsigned int color)

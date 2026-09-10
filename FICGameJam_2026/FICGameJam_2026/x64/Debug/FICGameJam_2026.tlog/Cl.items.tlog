@@ -18,10 +18,12 @@ C:\GitHub\FICGameJam_2026\FICGameJam_2026\main.cpp;C:\GitHub\FICGameJam_2026\FIC
 C:\GitHub\FICGameJam_2026\FICGameJam_2026\GameObject\Player.cpp;C:\GitHub\FICGameJam_2026\FICGameJam_2026\FICGameJam_2026\x64\Debug\Player.obj
 C:\GitHub\FICGameJam_2026\FICGameJam_2026\Collider\RectCollider.cpp;C:\GitHub\FICGameJam_2026\FICGameJam_2026\FICGameJam_2026\x64\Debug\RectCollider.obj
 C:\GitHub\FICGameJam_2026\FICGameJam_2026\PathFinder.cpp;C:\GitHub\FICGameJam_2026\FICGameJam_2026\FICGameJam_2026\x64\Debug\PathFinder.obj
+C:\GitHub\FICGameJam_2026\FICGameJam_2026\SaveData.cpp;C:\GitHub\FICGameJam_2026\FICGameJam_2026\FICGameJam_2026\x64\Debug\SaveData.obj
 C:\GitHub\FICGameJam_2026\FICGameJam_2026\Scene\ResultScene.cpp;C:\GitHub\FICGameJam_2026\FICGameJam_2026\FICGameJam_2026\x64\Debug\ResultScene.obj
 C:\GitHub\FICGameJam_2026\FICGameJam_2026\Scene\Scene.cpp;C:\GitHub\FICGameJam_2026\FICGameJam_2026\FICGameJam_2026\x64\Debug\Scene.obj
 C:\GitHub\FICGameJam_2026\FICGameJam_2026\Scene\GameScene.cpp;C:\GitHub\FICGameJam_2026\FICGameJam_2026\FICGameJam_2026\x64\Debug\GameScene.obj
 C:\GitHub\FICGameJam_2026\FICGameJam_2026\Scene\SceneManager.cpp;C:\GitHub\FICGameJam_2026\FICGameJam_2026\FICGameJam_2026\x64\Debug\SceneManager.obj
 C:\GitHub\FICGameJam_2026\FICGameJam_2026\Scene\TitleScene.cpp;C:\GitHub\FICGameJam_2026\FICGameJam_2026\FICGameJam_2026\x64\Debug\TitleScene.obj
+C:\GitHub\FICGameJam_2026\FICGameJam_2026\SoundManager.cpp;C:\GitHub\FICGameJam_2026\FICGameJam_2026\FICGameJam_2026\x64\Debug\SoundManager.obj
 C:\GitHub\FICGameJam_2026\FICGameJam_2026\StageLoader.cpp;C:\GitHub\FICGameJam_2026\FICGameJam_2026\FICGameJam_2026\x64\Debug\StageLoader.obj
 C:\GitHub\FICGameJam_2026\FICGameJam_2026\Vector2.cpp;C:\GitHub\FICGameJam_2026\FICGameJam_2026\FICGameJam_2026\x64\Debug\Vector2.obj

@@ -1,4 +1,5 @@
 #include "Chest.h"
+#include "../SoundManager.h"
 #include<Dxlib.h>
 
 namespace
@@ -77,6 +78,7 @@ bool Chest::IsOpenEvent()
 	if (isOpened_ && !isOpenEvent_)
 	{
 		isOpenEvent_ = true;
+		SoundManager::GetInstance().PlaySe(SE::OpenTreasure);
 		return true;
 	}
 	return false;

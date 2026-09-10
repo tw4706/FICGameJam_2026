@@ -157,11 +157,13 @@
     <ClCompile Include="GameObject\Player.cpp" />
     <ClCompile Include="Collider\RectCollider.cpp" />
     <ClCompile Include="PathFinder.cpp" />
+    <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="Scene\ResultScene.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Scene\SceneManager.cpp" />
     <ClCompile Include="Scene\TitleScene.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="StageLoader.cpp" />
     <ClCompile Include="Vector2.cpp" />
   </ItemGroup>
@@ -186,11 +188,13 @@
     <ClInclude Include="Collider\RectCollider.h" />
     <ClInclude Include="GameObject\Key.h" />
     <ClInclude Include="PathFinder.h" />
+    <ClInclude Include="SaveData.h" />
     <ClInclude Include="Scene\ResultScene.h" />
     <ClInclude Include="Scene\Scene.h" />
     <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Scene\SceneManager.h" />
     <ClInclude Include="Scene\TitleScene.h" />
+    <ClInclude Include="SoundManager.h" />
     <ClInclude Include="StageLoader.h" />
     <ClInclude Include="Vector2.h" />
   </ItemGroup>

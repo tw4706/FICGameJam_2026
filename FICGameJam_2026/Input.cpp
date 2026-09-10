@@ -101,10 +101,7 @@ void Input::Update()
 				input = keyState[state.id];
 				break;
 			case PeripheralType::padXInput:
-				if (isXInputConnected_)
-				{
-					input = (xInputState_.Buttons[state.id] != 0);
-				}
+				input = isXInputConnected_ && (xInputState_.Buttons[state.id] != 0);
 				break;
 			case PeripheralType::mouse:
 				input = (mouseInput & state.id) != 0;

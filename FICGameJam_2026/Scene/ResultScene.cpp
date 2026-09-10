@@ -3,6 +3,8 @@
 #include "GameScene.h"
 #include "../Game.h"
 #include "../Input.h"
+#include "../Button.h"
+#include "../SoundManager.h"
 #include<Dxlib.h>
 #include<memory>
 #include<cmath>
@@ -13,6 +15,10 @@ namespace
 {
 	//フェードの間隔
 	constexpr int kFadeInterval = 60;
+
+	//ボタンの当たり判定サイズ
+	constexpr int kButtonWidth = 240;
+	constexpr int kButtonHeight = 60;
 }
 
 ResultScene::ResultScene(SceneManager& sceneManager) :
@@ -25,11 +31,39 @@ ResultScene::ResultScene(SceneManager& sceneManager) :
 
 ResultScene::~ResultScene()
 {
+	DeleteGraph(button1FrameHandle_);
+	DeleteGraph(button2FrameHandle_);
 }
 
 void ResultScene::Init()
 {
 	SetMouseDispFlag(true);
+
+	button1FrameHandle_ = LoadGraph(L"data/ResultButonFrame.png");
+	button2FrameHandle_ = LoadGraph(L"data/ResultButonFrame.png");
+
+	//ボタン画像のサイズを取得
+	GetGraphSize(button1FrameHandle_, &buttonWidth_, &buttonHeight_);
+
+	//ボタンの中心座標を計算しButtonを生成
+	int centerX = Game::kScreenWidth / 2;
+	int button1CenterY = Game::kScreenHeight / 2 + buttonHeight_ / 2;
+	int button2CenterY = Game::kScreenHeight / 2 + 80 + buttonHeight_ / 2;
+
+	//ボタンの生成
+	retryButton_ = std::make_unique<Button>(
+		centerX, button1CenterY,
+		kButtonWidth, kButtonHeight,
+		button1FrameHandle_);
+	retryButton_->SetText(L"リトライ", Game::kFontUIHandle, 0x000000);
+
+	backTitleButton_ = std::make_unique<Button>(
+		centerX, button2CenterY,
+		kButtonWidth, kButtonHeight,
+		button2FrameHandle_);
+	backTitleButton_->SetText(L"タイトルに戻る", Game::kFontUIHandle, 0x000000);
+
+	SoundManager::GetInstance().PlayBgm(BGM::Result);
 }
 
 void ResultScene::Update()
@@ -56,11 +90,22 @@ void ResultScene::FadeInUpdate()
 
 void ResultScene::NormalUpdate()
 {
-	if (Input::GetInstance().IsPressed("next"))
+	retryButton_->Update();
+	backTitleButton_->Update();
+
+	//スタートボタンが押されたらゲームシーンへ遷移
+	if (backTitleButton_->IsClicked())
 	{
 		update_ = &ResultScene::FadeOutUpdate;
 		draw_ = &ResultScene::FadeDraw;
 		frameCount_ = kFadeInterval;
+	}
+
+	//リトライしたらステージ1に遷移
+	if(retryButton_->IsClicked())
+	{
+		sceneManager_.ChangeScene(std::make_shared<GameScene>(sceneManager_,GameScene::StageType::Stage1));
+		return;
 	}
 }
 
@@ -100,6 +145,18 @@ void ResultScene::FadeDraw()
 void ResultScene::NormalDraw()
 {
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x00ced1, true);
+
+	auto text = L"ゲームクリア";
+	int textLen = static_cast<int>(wcslen(text));
+
+	int textWidth = GetDrawStringWidthToHandle(text, textLen, Game::kFontUIHandle);
+	int drawX = Game::kScreenWidth / 2 - textWidth / 2 - 80;
+	int drawY = (Game::kScreenHeight/2 - 100) - GetFontSizeToHandle(Game::kFontUIHandle) / 2;
+
+	DrawExtendStringToHandle(drawX, drawY, 2.0f,2.0f,text, 0xffffff, Game::kFontUIHandle);
+
+	retryButton_->Draw();
+	backTitleButton_->Draw();
 #ifdef _DEBUG
 	DrawFormatString(0, 0, 0xffffff, L"リザルトシーン");
 #endif

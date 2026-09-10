@@ -5,6 +5,7 @@
 #include "Scene/GameScene.h"
 #include "Scene/SceneManager.h"
 #include "../EffectManager.h"
+#include "../SoundManager.h"
 #include<Dxlib.h>
 #include<memory>
 
@@ -43,6 +44,9 @@ bool Application::Init()
 	AddFontResourceEx(L"data/Font/Corporate-Logo-Rounded-Bold-ver3.otf", FR_PRIVATE, NULL);
 	Game::kFontUIHandle = CreateFontToHandle(L"コーポレート・ロゴ（ラウンド）ver3 Bold", 40, -1);
 
+	//サウンドマネージャーの初期化
+	SoundManager::GetInstance().Init();
+
 	return true;
 }
 
@@ -69,6 +73,9 @@ void Application::Run()
 		//シーンの更新と描画
 		sceneManager.Update();
 		sceneManager.Draw();
+
+		//サウンドの更新
+		SoundManager::GetInstance().Update();
 
 		//エフェクトの更新と描画
 		EffectManager::GetInstance().Update();
