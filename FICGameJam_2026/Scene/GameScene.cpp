@@ -42,9 +42,9 @@ namespace
 	const std::string kTilesetPath = "data/tileset.png";
 
 	//宝箱の設置位置
-	const Vector2 kChestKeyPos = { 770.0f, 360.0f };
-	const Vector2 kChestEnemyPos1 = { 630.0f, 630.0f };
-	const Vector2 kChestEnemyPos2 = { 500.0f, 230.0f };
+	const Vector2 kChestKeyPos = { 745.0f, 350.0f };
+	const Vector2 kChestEnemyPos1 = { 610.0f, 610.0f };
+	const Vector2 kChestEnemyPos2 = { 470.0f, 230.0f };
 
 	//チュートリアルのキャラの位置
 	const Vector2 kTutorialPlayerStartPos = { 150.0f, 150.0f };
@@ -61,7 +61,7 @@ namespace
 	constexpr int kTileSize = 64;
 
 	//ステージの拡大率
-	constexpr float kStageScale = 1.05f;
+	constexpr float kStageScale = 1.01f;
 
 	//タイル画像の横の枚数
 	constexpr int kTilesetColumns = 6;
@@ -94,6 +94,18 @@ GameScene::GameScene(SceneManager& sceneManager, StageType type) :
 		pGoal_ = std::make_shared<Goal>(kTutorialGoalStartPos, Vector2(0.0f, 0.0f), 0.0f, kGoalColSize, kGoalColSize);
 
 		pChests_.push_back(std::make_shared<Chest>(kTutorialChestKeyPos, Chest::ChestContents::Key));
+
+		tutorialMesseage_ =
+		{
+			L"今からチュートリアルをはじめます。",
+			L"プレイヤーはあかりの中に入っていると移動ができます。",
+			L"あかりから出ると停止します。",
+			L"逆に敵はあかりに一定時間いると倒れます。",
+			L"あかりの外にいると敵はプレイヤーを襲ってきます。",
+			L"宝箱を開けると鍵が出てきます。",
+			L"中には意外なものも...",
+			L"では鍵を見つけてゴールを目指しましょう！",
+		};
 	}
 	else
 	{
@@ -119,6 +131,7 @@ GameScene::~GameScene()
 {
 	DeleteGraph(lightHandle_);
 	DeleteGraph(darkMaskHandle_);
+	DeleteFontToHandle(tutorialFontHandle_);
 }
 
 void GameScene::Init()
@@ -135,6 +148,11 @@ void GameScene::Init()
 		chest->Init();
 	}
 
+	if (type_ == StageType::Tutorial)
+	{
+		tutorialFontHandle_ = CreateFontToHandle(NULL, 25, 6);
+	}
+
 	//死亡エフェクトのロード
 	EffectManager::GetInstance().Load(L"death", L"data/deathEffect.png",
 		Vector2{ 192.0f, 192.0f }, 7, 4);
@@ -143,7 +161,7 @@ void GameScene::Init()
 	loader_->SetWallTileId(kWallTileIds);
 
 	//マップデータのロード
-	const std::string& stageCsvPath =(type_ == StageType::Tutorial) ? kTutorialCsvPath : kStageCsvPath;
+	const std::string& stageCsvPath = (type_ == StageType::Tutorial) ? kTutorialCsvPath : kStageCsvPath;
 	loader_->Load(stageCsvPath);
 
 	//タイル画像のロード
@@ -176,15 +194,66 @@ void GameScene::FadeInUpdate()
 
 	if (frameCount_ <= 0)
 	{
-		update_ = &GameScene::NormalUpdate;
-		draw_ = &GameScene::NormalDraw;
+		//チュートリアルならメッセージ表示状態へ、それ以外は通常状態へ
+		if (type_ == StageType::Tutorial && !tutorialMesseage_.empty())
+		{
+			update_ = &GameScene::TutorialMessegeUpdate;
+			draw_ = &GameScene::TutorialMessegeDraw;
+		}
+		else
+		{
+			update_ = &GameScene::NormalUpdate;
+			draw_ = &GameScene::NormalDraw;
+		}
 		return;
+	}
+}
+
+void GameScene::TutorialMessegeUpdate()
+{
+
+	//メッセージ表示中もプレイヤーが動けるようにする
+	pPlayer_->Update();
+
+	//プレイヤーと壁の当たり判定
+	for (const auto& wall : wallColliders_)
+	{
+		if (collisionManager_.IsHitCollisionRect(pPlayer_->GetCollider(), wall))
+		{
+			Vector2 pushVector = collisionManager_.GetOverlapRect(pPlayer_->GetCollider(), wall);
+			pPlayer_->AdjustPosition(pushVector);
+		}
+	}
+
+	if (Input::GetInstance().IsTriggered("next"))
+	{
+		tutorialMesseageIndex_++;
+
+		SoundManager::GetInstance().PlaySe(SE::CursoleMove);
+
+		//全メッセージを見終わったら通常状態へ移行
+		if (tutorialMesseageIndex_ >= static_cast<int>(tutorialMesseage_.size()))
+		{
+			update_ = &GameScene::NormalUpdate;
+			draw_ = &GameScene::NormalDraw;
+			return;
+		}
 	}
 }
 
 void GameScene::NormalUpdate()
 {
 	frameCount_++;
+
+	//チュートリアルのメッセージを閉じてもまた見れるようにする
+	if (type_ == StageType::Tutorial && !tutorialMesseage_.empty() &&
+		Input::GetInstance().IsTriggered("onemore"))
+	{
+		tutorialMesseageIndex_ = 0;
+		update_ = &GameScene::TutorialMessegeUpdate;
+		draw_ = &GameScene::TutorialMessegeDraw;
+		return;
+	}
 
 	//宝箱の更新
 	UpdateChests();
@@ -370,6 +439,37 @@ void GameScene::FadeDraw()
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
+void GameScene::TutorialMessegeDraw()
+{
+	NormalDraw();
+
+	//メッセージウィンドウの座標
+	int boxX1 = 100;
+	int boxY1 = Game::kScreenHeight - 220;
+	int boxX2 = Game::kScreenWidth - 100;
+	int boxY2 = Game::kScreenHeight - 60;
+
+	//半透明の黒背景
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 200);
+	DrawBox(boxX1, boxY1, boxX2, boxY2, 0x000000, TRUE);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	//枠線
+	DrawBox(boxX1, boxY1, boxX2, boxY2, 0xffffff, FALSE);
+
+	//現在のメッセージ本文
+	if (tutorialMesseageIndex_ < static_cast<int>(tutorialMesseage_.size()))
+	{
+		const std::wstring& text = tutorialMesseage_[tutorialMesseageIndex_];
+		DrawStringToHandle(boxX1 + 30, boxY1 + 30, text.c_str(), 0xffffff, tutorialFontHandle_);
+	}
+
+	//続行案内
+	const wchar_t* hintText = L"[Enter]で次へ";
+	int hintWidth = GetDrawStringWidthToHandle(hintText, static_cast<int>(wcslen(hintText)), tutorialFontHandle_);
+	DrawStringToHandle(boxX2 - hintWidth - 20, boxY2-40, hintText, 0xaaaaaa, tutorialFontHandle_);
+}
+
 void GameScene::NormalDraw()
 {
 	//ステージの描画
@@ -384,7 +484,13 @@ void GameScene::NormalDraw()
 		gameobject->Draw();
 	}
 
-	DrawLightMask();
+	//DrawLightMask();
+
+	//チュートリアルを後から見れるように表示している
+	if (type_ == StageType::Tutorial)
+	{
+		DrawStringToHandle(Game::kScreenWidth-250, Game::kScreenHeight - 40, L"[O]で説明を見る", 0xffffff, tutorialFontHandle_);
+	}
 
 #ifdef _DEBUG
 	DrawFormatString(0, 0, 0xffffff, L"ゲームシーン");

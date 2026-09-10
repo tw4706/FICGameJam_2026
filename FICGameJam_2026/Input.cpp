@@ -33,6 +33,8 @@ Input::Input() :inputData_{}, lastInputData_{}, inputTable_{}
 						{PeripheralType::padXInput,XINPUT_BUTTON_A} };
 	inputTable_["open"] = { {PeripheralType::padXInput,XINPUT_BUTTON_A},
 						{PeripheralType::mouse,MOUSE_INPUT_RIGHT} };
+	inputTable_["onemore"] = { {PeripheralType::keyboard,KEY_INPUT_O},
+					{PeripheralType::padXInput,XINPUT_BUTTON_Y} };
 
 	inputTable_["click"] = { {PeripheralType::mouse, MOUSE_INPUT_LEFT} };
 
