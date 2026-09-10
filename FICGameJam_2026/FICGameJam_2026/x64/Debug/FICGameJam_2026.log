@@ -1,10 +1,12 @@
-﻿  GameScene.cpp
-C:\GitHub\FICGameJam_2026\FICGameJam_2026\Scene\GameScene.cpp(297,18): warning C4244: '=': 'const float' から 'int' への変換です。データが失われる可能性があります。
+﻿  Application.cpp
+C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\Application.cpp(39,10): warning C4305: 'return': 'int' から 'bool' へ切り詰めます。
+  GameScene.cpp
+C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\Scene\GameScene.cpp(297,18): warning C4244: '=': 'const float' から 'int' への変換です。データが失われる可能性があります。
 C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xutility(462,85): warning C4244: '引数': 'const float' から 'int' への変換です。データが失われる可能性があります。
   (ソース ファイル 'Scene/GameScene.cpp' をコンパイルしています)
       C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xutility(462,85):
       テンプレートインスタンス化コンテキスト (最初に最も古いもの) は
-          C:\GitHub\FICGameJam_2026\FICGameJam_2026\Scene\GameScene.cpp(94,17):
+          C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\Scene\GameScene.cpp(94,17):
           コンパイル対象の関数 テンプレート インスタンス化 'std::shared_ptr<Goal> std::make_shared<Goal,const Vector2&,Vector2,float,const float&,const float&>(const Vector2 &,Vector2 &&,float &&,const float &,const float &)' のリファレンスを確認してください
           C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\memory(2913,46):
           コンパイル対象の関数 テンプレート インスタンス化 'std::_Ref_count_obj2<Goal>::_Ref_count_obj2<const Vector2&,_Ty,float,const float&,const float&>(const Vector2 &,_Ty &&,float &&,const float &,const float &)' のリファレンスを確認してください
@@ -45,4 +47,7 @@ C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.3520
               _Ty=Goal
           ]
   
-  FICGameJam_2026.vcxproj -> C:\GitHub\FICGameJam_2026\FICGameJam_2026\x64\Debug\FICGameJam_2026.exe
+  ResultScene.cpp
+  TitleScene.cpp
+  コードを生成中...
+  FICGameJam_2026.vcxproj -> C:\Users\yongy\git\FICGameJam_2026\FICGameJam_2026\x64\Debug\FICGameJam_2026.exe

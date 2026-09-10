@@ -40,6 +40,10 @@ void TitleScene::Init()
 {
 	frameCount_ = kFadeInterval;
 
+	//”wŒi‚Ì¶¬E‰Šú‰»
+	pBg_ = std::make_unique<Bg>(L"data/Bg.png", 0.5f, 0.3f);
+	pBg_->Init();
+
 	titleLogoHandle_ = LoadGraph(L"data/titleLogo.png");
 	button1FrameHandle_ = LoadGraph(L"data/ButtonFrame.png");
 	button2FrameHandle_ = LoadGraph(L"data/ButtonFrame.png");
@@ -91,6 +95,8 @@ void TitleScene::FadeInUpdate()
 
 void TitleScene::NormalUpdate()
 {
+	pBg_->Update();
+
 	startButton_->Update();
 	endButton_->Update();
 
@@ -150,7 +156,7 @@ void TitleScene::FadeDraw()
 
 void TitleScene::NormalDraw()
 {
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x00ced1, true);
+	pBg_->Draw();
 
 	DrawGraph(Game::kScreenWidth/2-530, Game::kScreenHeight/2-680, titleLogoHandle_, true);
 

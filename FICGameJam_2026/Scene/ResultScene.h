@@ -1,12 +1,19 @@
 #pragma once
 #include "Scene.h"
+#include "../Bg.h"
 #include<memory>
 
 class Button;
 class ResultScene :public Scene
 {
 public:
-	ResultScene(SceneManager& sceneManager);
+	enum class ResultType
+	{
+		Clear,
+		GameOver
+	};
+
+	ResultScene(SceneManager& sceneManager ,ResultType result);
 	~ResultScene();
 
 	void Init()override;
@@ -34,8 +41,13 @@ private:
 	int buttonWidth_ = 0;
 	int buttonHeight_ = 0;
 
+	ResultType result_;
+
 	//リトライボタン、タイトルに戻るボタン
 	std::unique_ptr<Button> retryButton_;
 	std::unique_ptr<Button> backTitleButton_;
+
+	//背景
+	std::unique_ptr<Bg> pBg_;
 };
 

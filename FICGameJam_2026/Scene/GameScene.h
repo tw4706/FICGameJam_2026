@@ -61,6 +61,7 @@ private:
 	bool isKey_ = false;									//鍵を持っているかどうか
 	int tutorialMesseageIndex_ = 0;							//表示中の番号
 	int tutorialFontHandle_ = -1;
+	bool isGameOver_ = false;								//ゲームオーバーかどうか
 
 	CollisionManager collisionManager_;						//当たり判定マネージャー
 	PathFinder pathFinder_;									//経路探索

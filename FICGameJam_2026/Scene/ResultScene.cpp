@@ -21,8 +21,9 @@ namespace
 	constexpr int kButtonHeight = 60;
 }
 
-ResultScene::ResultScene(SceneManager& sceneManager) :
+ResultScene::ResultScene(SceneManager& sceneManager,ResultType result) :
 	Scene(sceneManager),
+	result_(result),
 	update_(&ResultScene::FadeInUpdate),
 	draw_(&ResultScene::FadeDraw),
 	frameCount_(kFadeInterval)
@@ -37,7 +38,12 @@ ResultScene::~ResultScene()
 
 void ResultScene::Init()
 {
+	frameCount_ = kFadeInterval;
+
 	SetMouseDispFlag(true);
+
+	pBg_ = std::make_unique<Bg>(L"data/Bg.png", 0.5f, 0.3f);
+	pBg_->Init();
 
 	button1FrameHandle_ = LoadGraph(L"data/ResultButonFrame.png");
 	button2FrameHandle_ = LoadGraph(L"data/ResultButonFrame.png");
@@ -90,6 +96,8 @@ void ResultScene::FadeInUpdate()
 
 void ResultScene::NormalUpdate()
 {
+	pBg_->Update();
+
 	retryButton_->Update();
 	backTitleButton_->Update();
 
@@ -144,11 +152,13 @@ void ResultScene::FadeDraw()
 
 void ResultScene::NormalDraw()
 {
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x00ced1, true);
+	pBg_->Draw();
 
-	auto text = L"ゲームクリア";
+	//クリア/ゲームオーバーで表示テキストと色を切り替える
+	const wchar_t* text = (result_ == ResultType::Clear) ? L"クリア！" : L"ゲームオーバー";
+	unsigned int color = (result_ == ResultType::Clear) ? 0xffffff : 0xff0000;
+
 	int textLen = static_cast<int>(wcslen(text));
-
 	int textWidth = GetDrawStringWidthToHandle(text, textLen, Game::kFontUIHandle);
 	int drawX = Game::kScreenWidth / 2 - textWidth / 2 - 80;
 	int drawY = (Game::kScreenHeight/2 - 100) - GetFontSizeToHandle(Game::kFontUIHandle) / 2;

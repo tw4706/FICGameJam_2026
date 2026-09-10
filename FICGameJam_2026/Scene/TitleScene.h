@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene.h"
 #include "SceneManager.h"
+#include "../Bg.h"
 
 class Bg;
 class Button;
@@ -43,4 +44,7 @@ private:
 	//スタートボタン、終了ボタン
 	std::unique_ptr<Button> startButton_;
 	std::unique_ptr<Button> endButton_;
+
+	//背景
+	std::unique_ptr<Bg> pBg_;
 };

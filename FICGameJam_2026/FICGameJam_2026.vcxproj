@@ -139,6 +139,7 @@
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Bg.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="EffectManager.cpp" />
     <ClCompile Include="GameObject\DeathEffect.cpp" />
@@ -170,6 +171,7 @@
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Bg.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="EffectManager.h" />
     <ClInclude Include="GameObject\DeathEffect.h" />

@@ -34,7 +34,7 @@ namespace
 	//各キャラクターの初期位置
 	const Vector2 kPlayerStartPos = { 100.0f, 100.0f };
 	const Vector2 kEnemyStartPos = { 200.0f, 400.0f };
-	const Vector2 kGoalStartPos = { 900.0f, 100.0f };
+	const Vector2 kGoalStartPos = { 930.0f, 100.0f };
 
 	//ステージロード用
 	const std::string kStageCsvPath = "data/CSV/stage1.csv";
@@ -49,7 +49,7 @@ namespace
 	//チュートリアルのキャラの位置
 	const Vector2 kTutorialPlayerStartPos = { 150.0f, 150.0f };
 	const Vector2 kTutorialGoalStartPos = { 900.0f, 300.0f };
-	const Vector2 kTutorialChestKeyPos = { 600.0f, 400.0f };
+	const Vector2 kTutorialChestKeyPos = { 550.0f, 400.0f };
 
 	//鍵の座標
 	const Vector2 kKeyPos = { 770.0f, 360.0f };
@@ -365,6 +365,7 @@ void GameScene::NormalUpdate()
 	//プレイヤーが死んだときリザルトシーンに遷移
 	if (pPlayer_ && pPlayer_->IsDead())
 	{
+		isGameOver_ = true;
 		update_ = &GameScene::FadeOutUpdate;
 		draw_ = &GameScene::FadeDraw;
 		frameCount_ = kFadeInterval;
@@ -411,7 +412,9 @@ void GameScene::FadeOutUpdate()
 		}
 		else
 		{
-			sceneManager_.ChangeScene(std::make_shared<ResultScene>(sceneManager_));
+			//死亡していればゲームオーバー、そうでなければクリアとして渡す
+			ResultScene::ResultType result = isGameOver_ ? ResultScene::ResultType::GameOver : ResultScene::ResultType::Clear;
+			sceneManager_.ChangeScene(std::make_shared<ResultScene>(sceneManager_, result));
 		}
 		return;
 	}
@@ -484,7 +487,7 @@ void GameScene::NormalDraw()
 		gameobject->Draw();
 	}
 
-	//DrawLightMask();
+	DrawLightMask();
 
 	//チュートリアルを後から見れるように表示している
 	if (type_ == StageType::Tutorial)
