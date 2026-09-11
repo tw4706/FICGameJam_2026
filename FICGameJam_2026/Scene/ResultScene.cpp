@@ -160,10 +160,11 @@ void ResultScene::NormalDraw()
 
 	int textLen = static_cast<int>(wcslen(text));
 	int textWidth = GetDrawStringWidthToHandle(text, textLen, Game::kFontUIHandle);
-	int drawX = Game::kScreenWidth / 2 - textWidth / 2 - 80;
+	int drawX = Game::kScreenWidth / 2 - textWidth / 2-40;
 	int drawY = (Game::kScreenHeight/2 - 100) - GetFontSizeToHandle(Game::kFontUIHandle) / 2;
 
 	DrawExtendStringToHandle(drawX, drawY, 2.0f,2.0f,text, 0xffffff, Game::kFontUIHandle);
+	DrawExtendStringToHandle(drawX+4, drawY+4, 2.0f,2.0f,text, 0x000000, Game::kFontUIHandle);
 
 	retryButton_->Draw();
 	backTitleButton_->Draw();

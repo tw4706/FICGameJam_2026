@@ -141,6 +141,9 @@ void GameScene::Init()
 	//各オブジェクトの初期化
 	pPlayer_->Init();
 
+	//マウスの位置をプレイヤーの位置にする
+	SetMousePoint(static_cast<int>(pPlayer_->GetPos().x), static_cast<int>(pPlayer_->GetPos().y));
+
 	pGoal_->Init();
 
 	for (auto& chest : pChests_)
