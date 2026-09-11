@@ -160,7 +160,12 @@ void ResultScene::NormalDraw()
 
 	int textLen = static_cast<int>(wcslen(text));
 	int textWidth = GetDrawStringWidthToHandle(text, textLen, Game::kFontUIHandle);
-	int drawX = Game::kScreenWidth / 2 - textWidth / 2-40;
+	int drawX = Game::kScreenWidth / 2 - textWidth / 2 - 40;
+	if (result_ == ResultType::GameOver)
+	{
+		drawX= Game::kScreenWidth / 2 - textWidth / 2 - 80;
+	}
+
 	int drawY = (Game::kScreenHeight/2 - 100) - GetFontSizeToHandle(Game::kFontUIHandle) / 2;
 
 	DrawExtendStringToHandle(drawX, drawY, 2.0f,2.0f,text, 0xffffff, Game::kFontUIHandle);
